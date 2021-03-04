@@ -1,5 +1,5 @@
 import unittest
-from handlers import _subreddit_is_valid
+from reddit import _subreddit_is_valid
 
 class TestStringMethods(unittest.TestCase):
 
