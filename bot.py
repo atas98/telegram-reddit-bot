@@ -1,43 +1,21 @@
-import json
-import asyncio
+from utils import load_config
+from pathlib import Path
 import logging
-import telegram
-from handlers import *
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     # Configure logging
-    logging.basicConfig(filename='dump.log', level=logging.DEBUG)
-    
-    telegramToken, reddit = json.load(open('./config.json', 'r'))
-    
-    executor = telegram.init(telegramToken)
-    
-    executor.start_polling(disp, skip_updates=True)
-    
+    logging.basicConfig(level=logging.DEBUG, filename='dump.log')
 
+    # Initialize and check config
+    try:
+        CONFIG = load_config(Path.joinpath(Path(__file__).parent, "config/config.json"))
+    except ValueError as ex:
+        exit(f"Error: {ex}")
 
+    # Now load everything else
+    from aiogram import executor
+    from misc import dp
+    import handlers
 
-
-
-
-
-# @bot.message_handler(commands=['start'])
-# def start_message(message):
-#     bot.send_message(message.chat.id, 'Hey there fellow redditor')
-    
-# @bot.message_handler(commands=['help'])
-# def start_message(message):
-#     bot.send_message(message.chat.id, 'To use bot type valid subreddit name or paste link to post (e.g. r/all)')
-
-# @bot.message_handler(content_types=['text'])
-# def get_text_messages(message): 
-#     command, *props = message.text.split()
-#     command = command.lower()
-    
-#     for post in commands[command](*props): 
-#         bot.send_message(message.from_user.id, post)
-
-# if __name__ == '__main__':
-#     print("Polling...")
-#     bot.polling(none_stop=True, interval=0)
+    executor.start_polling(dp, skip_updates=True, on_startup=handlers.commands.register_bot_commands)
