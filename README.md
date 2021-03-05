@@ -1,4 +1,6 @@
-<<<<<<< HEAD
+# telegram-reddit-bot
+Telegram bot for peeking reddit post
+
 # Logic
 ### Commands
 * __URL__ -> show content of the post (mb user too)
@@ -33,8 +35,3 @@
 * /Utils/
 * /bot.py
 * /loader.py
-
-=======
-# telegram-reddit-bot
-Telegram bot for peeking reddit post
->>>>>>> f83af643ad57319ad70b89c3d5ababc57ce4cb10
