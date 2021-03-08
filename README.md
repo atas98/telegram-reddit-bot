@@ -13,25 +13,3 @@ Telegram bot for peeking reddit post
 * __/subscribe__ -> send new posts every N minutes
 * __/show_subscribtions__ -> 
 * __/unsubscribe__ -> 
-
-### Post types
-* Text -> _self_post_ is _True_
-* Photo  __TODO:__ Check if imgur links are parsed as photos 
-* Video
-* Gif
-* Link
-
-
-
-# Project stucture
-
-* /Data/
-* /States/
-* /Keyboards/
-* /Keyboards/inline
-* /Keyboards/base
-* /Models/ -> Mongo + Redis stuff
-* /Services -> reddit api logic
-* /Utils/
-* /bot.py
-* /loader.py
