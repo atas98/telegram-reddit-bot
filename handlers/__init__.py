@@ -1,4 +1,3 @@
-from . import raw_text
-from . import show
+from .initialize import register_bot_commands
 
-__all__ = [raw_text, show]
+__all__ = [register_bot_commands]
