@@ -7,7 +7,7 @@ from functools import partial
 # from aiogram.dispatcher import FSMContext
 
 from misc import reddit
-from controllers.reddit import get_post_by_url, Post_Types
+from controllers.reddit import get_post_by_url, Post_Types, photos_from_albumn
 
 MAX_LENGTH = 4000
 
@@ -27,15 +27,23 @@ async def raw_idle(message: types.Message):
             await message.answer(f"<b>{post.title}</b>", parse_mode='html')
             for text_chunk in iter(partial(post.text, MAX_LENGTH), ''):
                 await message.answer(text_chunk)
-        # if post.type == Post_Types.PIC:
-        #     await message.answer_photo(post.url, caption=post.title)
-        # if post.type == Post_Types.VID:
-        #     await message.answer_video(post.url, caption=post.title)
-        # if post.type == Post_Types.GIF:
-        #     await message.answer_animation(post.url, caption=post.title)
-        # if post.type == Post_Types.LINK:
-        #     await message.answer(f"[{post.title}]({post.url})",
-        #                          parse_mode='MarkdownV2')
+    elif post.type == Post_Types.PIC:
+        await message.answer_photo(post.url, caption=post.title)
+    elif post.type == Post_Types.ALB:
+        albumn = [
+            types.InputMediaPhoto(url) for url in photos_from_albumn(post)
+        ]
+        await message.answer_media_group(post.title)
+        await message.answer_media_group(albumn)
+    elif post.type == Post_Types.VID:
+        await message.answer_video(post.url, caption=post.title)
+    elif post.type == Post_Types.GIF:
+        await message.answer_animation(post.url, caption=post.title)
+    elif post.type == Post_Types.LINK:
+        await message.answer(f"[{post.title}]({post.url})",
+                             parse_mode='MarkdownV2')
+    else:
+        await message.answer("Hey, thats illegal! (post type)")
 
 
 # def raw_command_show(message: types.Message, state: FSMContext):

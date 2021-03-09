@@ -14,7 +14,9 @@ class Post_Types(Enum):
     PIC = 1
     GIF = 2
     VID = 3
-    LINK = 4
+    ALB = 4
+    LINK = 5
+    UNKNOWN = 6
 
 
 supported_types = {
@@ -35,17 +37,24 @@ def get_post_type(post: Submission) -> Post_Types:
     """
     if post.is_self:
         return Post_Types.TEXT
-    try:
-        header_type = requests.head(post.url).headers['Content-Type']
-        for key, type_headers in supported_types.items():
-            if header_type in type_headers:
-                return key
-    except Exception as err:
-        logging.warning(err)
-    return Post_Types.LINK
+    elif post.is_video:
+        return Post_Types.VID
+    elif post.is_albumn:
+        return Post_Types.ALB
+    elif post.url:
+        try:
+            header_type = requests.head(post.url).headers['Content-Type']
+            for key, supported_headers in supported_types.items():
+                if header_type in supported_headers:
+                    return key
+        except Exception as err:
+            logging.warning(err)
+        return Post_Types.LINK
+    else:
+        return Post_Types.UNKNOWN
 
 
-# TODO: Move all dataclasses/enums to separate module
+# TODO: Move all dataclasses/enums to separate file
 @dataclass
 class Post_Data:
     title: str
@@ -108,6 +117,16 @@ async def get_posts_from_subreddit(
     except TypeError as err:
         logging.error(err)
         return
+
+
+def photos_from_albumn(post: Submission) -> Generator[str, None, None]:
+    post = r.submission(id="jxqus2")
+
+    ids = [i['media_id'] for i in post.gallery_data['items']]
+    for id in ids:
+        url = post.media_metadata[id]['p'][0]['u']
+        url = url.split("?")[0].replace("preview", "i")
+        yield url
 
 
 # TODO: auth with refreshToken
