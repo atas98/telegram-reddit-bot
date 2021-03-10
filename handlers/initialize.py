@@ -1,6 +1,6 @@
 from aiogram import Dispatcher, types
 from .commands import command_start, command_help
-from .raw_text import raw_idle
+from .raw_idle import raw_idle
 
 
 def initialize_handlers(dp: Dispatcher):

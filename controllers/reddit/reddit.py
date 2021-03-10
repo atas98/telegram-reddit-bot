@@ -119,7 +119,7 @@ async def get_posts_from_subreddit(
         return
 
 
-def photos_from_albumn(post: Submission) -> Generator[str, None, None]:
+def photos_from_album(post: Submission) -> Generator[str, None, None]:
     ids = [i['media_id'] for i in post.gallery_data['items']]
     for id in ids:
         url = post.media_metadata[id]['p'][0]['u']
