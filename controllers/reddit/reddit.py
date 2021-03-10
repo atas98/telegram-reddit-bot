@@ -100,7 +100,6 @@ class Sort_Types(Enum):
     HOT = 'hot'
     TOP = 'top'
     NEW = 'new'
-    BEST = 'best'
     RISING = 'rising'
     RANDOM = 'random_rising'
 

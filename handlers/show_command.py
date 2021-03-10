@@ -11,9 +11,10 @@ async def command_show(message: types.Message):
     if not args:
         return
     try:
+        # delete r/ in sub
         subreddit, sort_by, quantity = args
         sort_by = sort_by.upper()
-    except AttributeError:
+    except (AttributeError, ValueError):
         await message.answer("Oopsie, wrong arguments here")
         return
     if not quantity.isnumeric():
