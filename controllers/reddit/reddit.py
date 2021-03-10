@@ -1,11 +1,13 @@
 import logging
 import requests
+import typing
 
 from asyncpraw import Reddit
 from asyncpraw.models import Submission, Subreddit
+from asyncpraw.exceptions import InvalidURL
 from dataclasses import dataclass
 from enum import Enum, unique
-from typing import Generator, Optional, Union
+from typing import Any, Generator, Optional, Union
 
 
 @unique
@@ -39,7 +41,9 @@ def get_post_type(post: Submission) -> Post_Types:
         return Post_Types.TEXT
     elif hasattr(post, 'is_video') and post.is_video:
         return Post_Types.VID
-    elif hasattr(post, 'is_album') and post.is_album:
+    elif hasattr(post,
+                 'is_gallery') and hasattr(post, 'media_metadata') and hasattr(
+                     post, 'gallery_data') and post.is_gallery:
         return Post_Types.ALB
     elif post.url:
         try:
@@ -63,6 +67,8 @@ class Post_Data:
     type: Post_Types
     score: int
     comments: int
+    media_metadata: typing.List[Any]
+    gallery_data: typing.Dict[str, Any]
 
 
 async def get_post_by_url(reddit_obj: Reddit, url: str) -> Post_Data:
@@ -75,13 +81,18 @@ async def get_post_by_url(reddit_obj: Reddit, url: str) -> Post_Data:
     Returns:
         Post_Data
     """
-    post = await reddit_obj.submission(url=url)
+    try:
+        post = await reddit_obj.submission(url=url)
+    except InvalidURL as err:
+        raise ValueError(err)
     return Post_Data(title=post.title,
                      text=post.selftext,
                      url=post.url,
                      score=post.score,
                      comments=post.num_comments,
-                     type=get_post_type(post))
+                     type=get_post_type(post),
+                     media_metadata=getattr(post, "media_metadata", None),
+                     gallery_data=getattr(post, "gallery_data", None))
 
 
 @unique
@@ -107,20 +118,39 @@ async def get_posts_from_subreddit(
         raise ValueError
 
     try:
-        async for post in getattr(subreddit, sort_by)(limit=quantity):
-            yield Post_Data(title=post.title,
-                            text=post.selftext,
-                            url=post.url,
-                            type=get_post_type(post),
-                            score=post.score,
-                            comments=post.num_comments)
+        if sort_by != Sort_Types.RANDOM:
+            async for post in getattr(subreddit,
+                                      sort_by.value)(limit=quantity):
+                yield Post_Data(title=post.title,
+                                text=post.selftext,
+                                url=post.url,
+                                type=get_post_type(post),
+                                score=post.score,
+                                comments=post.num_comments,
+                                media_metadata=getattr(post, "media_metadata",
+                                                       None),
+                                gallery_data=getattr(post, "gallery_data",
+                                                     None))
+        else:
+            for _ in range(quantity):
+                post = await subreddit.random()
+                yield Post_Data(title=post.title,
+                                text=post.selftext,
+                                url=post.url,
+                                type=get_post_type(post),
+                                score=post.score,
+                                comments=post.num_comments,
+                                media_metadata=getattr(post, "media_metadata",
+                                                       None),
+                                gallery_data=getattr(post, "gallery_data",
+                                                     None))
     except TypeError as err:
         logging.error(err)
         return
 
 
-def photos_from_album(post: Submission) -> Generator[str, None, None]:
-    ids = [i['media_id'] for i in post.gallery_data['items']]
+def photos_from_album(post: Post_Data) -> Generator[str, None, None]:
+    ids = [item['media_id'] for item in post.gallery_data['items']]
     for id in ids:
         url = post.media_metadata[id]['p'][0]['u']
         url = url.split("?")[0].replace("preview", "i")

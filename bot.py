@@ -4,7 +4,7 @@ import logging
 
 if __name__ == '__main__':
     # Configure logging
-    logging.basicConfig(level=logging.DEBUG, filename='dump.log')
+    logging.basicConfig(level=logging.INFO, filename='dump.log')
 
     # Initialize and check config
     try:
