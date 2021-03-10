@@ -37,9 +37,9 @@ def get_post_type(post: Submission) -> Post_Types:
     """
     if post.is_self:
         return Post_Types.TEXT
-    elif post.is_video:
+    elif hasattr(post, 'is_video') and post.is_video:
         return Post_Types.VID
-    elif post.is_albumn:
+    elif hasattr(post, 'is_album') and post.is_album:
         return Post_Types.ALB
     elif post.url:
         try:
@@ -120,8 +120,6 @@ async def get_posts_from_subreddit(
 
 
 def photos_from_albumn(post: Submission) -> Generator[str, None, None]:
-    post = r.submission(id="jxqus2")
-
     ids = [i['media_id'] for i in post.gallery_data['items']]
     for id in ids:
         url = post.media_metadata[id]['p'][0]['u']

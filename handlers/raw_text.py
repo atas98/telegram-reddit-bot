@@ -7,7 +7,7 @@ from functools import partial
 # from aiogram.dispatcher import FSMContext
 
 from misc import reddit
-from controllers.reddit import get_post_by_url, Post_Types, photos_from_albumn
+from controllers.reddit import get_post_by_url, photos_from_albumn, Post_Types
 
 MAX_LENGTH = 4000
 
@@ -29,19 +29,18 @@ async def raw_idle(message: types.Message):
                 await message.answer(text_chunk)
     elif post.type == Post_Types.PIC:
         await message.answer_photo(post.url, caption=post.title)
-    elif post.type == Post_Types.ALB:
+    elif post.type == Post_Types.ALB:  # FUCK
         albumn = [
             types.InputMediaPhoto(url) for url in photos_from_albumn(post)
         ]
         await message.answer_media_group(post.title)
         await message.answer_media_group(albumn)
-    elif post.type == Post_Types.VID:
+    elif post.type == Post_Types.VID:  # FUCK
         await message.answer_video(post.url, caption=post.title)
-    elif post.type == Post_Types.GIF:
+    elif post.type == Post_Types.GIF:  # FUCK
         await message.answer_animation(post.url, caption=post.title)
     elif post.type == Post_Types.LINK:
-        await message.answer(f"[{post.title}]({post.url})",
-                             parse_mode='MarkdownV2')
+        await message.answer(f"{post.title}\n{post.url}")
     else:
         await message.answer("Hey, thats illegal! (post type)")
 
