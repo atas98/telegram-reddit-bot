@@ -1,11 +1,7 @@
-from aiogram.utils.helper import Helper, HelperMode, ListItem
+from aiogram.dispatcher.filters.state import State, StatesGroup
 
 
-class TestStates(Helper):
-    mode = HelperMode.snake_case
-
-    IDLE = ListItem()
-    WAIT_FOR_INPUT = ListItem()
-    INP_SUBREDDIT = ListItem()
-    INP_SORTBY = ListItem()
-    INP_QUANTITY = ListItem()
+class ChatStates(StatesGroup):
+    INP_SUBREDDIT = State()
+    INP_SORTBY = State()
+    INP_QUANTITY = State()

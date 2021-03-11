@@ -103,6 +103,13 @@ class Sort_Types(Enum):
     RISING = 'rising'
     RANDOM = 'random_rising'
 
+    @staticmethod
+    def get(input_sortby: str) -> Sort_Types:
+        try:
+            return self.__members__[input_sortby]
+        except AttributeError:
+            return None
+
 
 async def get_posts_from_subreddit(
         reddit_obj: Reddit, subreddit: Union[str,
