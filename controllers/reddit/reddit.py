@@ -59,6 +59,7 @@ def get_post_type(post: Submission) -> Post_Types:
 
 
 # TODO: Move all dataclasses/enums to separate file
+# TODO: add id field
 @dataclass
 class Post_Data:
     title: str
@@ -104,9 +105,9 @@ class Sort_Types(Enum):
     RANDOM = 'random_rising'
 
     @staticmethod
-    def get(input_sortby: str) -> Sort_Types:
+    def get(input_sortby: str):
         try:
-            return self.__members__[input_sortby]
+            return Sort_Types.__members__[input_sortby]
         except AttributeError:
             return None
 

@@ -1,9 +1,9 @@
 from aiogram import types
-from aiogram.dispatcher import FSMContext 
+from aiogram.dispatcher import FSMContext
 from controllers.reddit import Sort_Types, get_posts_from_subreddit
 from .type_handlers import type_handlers
 from misc import reddit
-from types import Union
+from typing import Union
 from utils import ChatStates
 
 
@@ -36,9 +36,10 @@ def validate_quantity(quantity: str) -> Union[int, None]:
 async def command_show(message: types.Message):
     args = message.get_args().split()
     if not args:
-        ChatStates.INP_SUBREDDIT.set()
-        return # Start input session Sub -> Sortby -> Quantity
-    if len(args) != 3
+        await ChatStates.INP_SUBREDDIT.set()
+        await message.answer("Subreddit:")
+        return  # Start input session Sub -> Sortby -> Quantity
+    if len(args) != 3:
         await message.answer("Oopsie, wrong arguments here")
         return
 
@@ -46,7 +47,7 @@ async def command_show(message: types.Message):
     subreddit = validate_subreddit(subreddit)
     sort_by = validate_sortby(sort_by)
     quantity = validate_quantity(quantity)
-    
+
     if not subreddit or not sort_by or not quantity:
         await message.answer("Oopsie, wrong arguments here")
         return
@@ -59,29 +60,45 @@ async def command_show(message: types.Message):
 
 async def subreddit_input(message: types.Message, state: FSMContext):
     subreddit = validate_subreddit(message.text)
+    # TODO: Check if sub exists
     if not subreddit:
-        await message.answer("What are u trying to tell me? I dont understand. You can try again or fuck yourself")
+        await message.answer(
+            "What are u trying to tell me? I dont understand. You can try again or fuck yourself"
+        )
         return
     await state.update_data(subreddit=subreddit)
     await ChatStates.next()
     await message.answer("Sort by:")
 
+
 async def sortby_input(message: types.Message, state: FSMContext):
     sortby = validate_sortby(message.text)
     if not sortby:
-        await message.answer("What are u trying to tell me? I dont understand. You can try again or fuck yourself")
+        await message.answer(
+            "What are u trying to tell me? I dont understand. You can try again or fuck yourself"
+        )
         return
     await state.update_data(sortby=sortby)
     await ChatStates.next()
     await message.answer("Quantity:")
 
-async def sortby_input(message: types.Message, state: FSMContext):
-    sortby = validate_sortby(message.text)
-    if not sortby:
-        await message.answer("What are u trying to tell me? I dont understand. You can try again or fuck yourself")
+
+async def quantity_input(message: types.Message, state: FSMContext):
+    input_quantity = validate_quantity(message.text)
+    if not input_quantity:
+        await message.answer(
+            "What are u trying to tell me? I dont understand. You can try again or fuck yourself"
+        )
         return
 
-    # !FINISHME!
-    # await state.get_data()
+    # Retrive data from state
+    input_data = await state.get_data()
+    input_subreddit = input_data['subreddit']
+    input_sortby = input_data['sortby']
+
+    # Return posts
+    async for post in get_posts_from_subreddit(reddit, input_subreddit,
+                                               input_sortby, input_quantity):
+        await type_handlers[post.type](message, post)
 
     await state.finish()

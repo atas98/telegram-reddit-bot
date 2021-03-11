@@ -11,11 +11,13 @@ def _text_chunks(text: str, chunk_size: int) -> Generator[str, None, None]:
         yield text[i:i + chunk_size]
 
 
+# FIXME: Broke it
 async def text_post_handler(message: types.Message, post: Post_Data):
     try:
-        await message.answer(f"**{post.title}**")
+        await message.answer(f"<b>{post.title}</b>\n{post.text}",
+                             parse_mode="html")
     except MessageIsTooLong:
-        await message.answer(f"**{post.title}**")
+        await message.answer(f"<b>{post.title}</b>", parse_mode="html")
         for text_chunk in _text_chunks(post.text, MAX_TELEGRAM_MESSAGE_LENGTH):
             await message.answer(text_chunk)
 

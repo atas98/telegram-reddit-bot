@@ -1,7 +1,8 @@
 from aiogram import Dispatcher, types
 from .other_commands import command_start, command_help, command_report
-from .show_command import command_show
+from .show_command import command_show, subreddit_input, sortby_input, quantity_input
 from .raw_idle import raw_idle
+from utils.states import ChatStates
 
 
 def initialize_handlers(dp: Dispatcher):
@@ -9,7 +10,11 @@ def initialize_handlers(dp: Dispatcher):
     dp.register_message_handler(command_help, commands=["help"])
     dp.register_message_handler(command_report, commands=["report"])
     dp.register_message_handler(command_show, commands=["show"])
-    dp.register_message_handler(raw_idle, content_types=["text"])
+    dp.register_message_handler(subreddit_input,
+                                state=ChatStates.INP_SUBREDDIT)
+    dp.register_message_handler(sortby_input, state=ChatStates.INP_SORTBY)
+    dp.register_message_handler(quantity_input, state=ChatStates.INP_QUANTITY)
+    dp.register_message_handler(raw_idle, content_types=["text"], state="*")
 
 
 async def register_bot_commands(dp: Dispatcher):
