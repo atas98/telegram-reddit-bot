@@ -4,7 +4,7 @@ from controllers.reddit import Sort_Types, get_posts_from_subreddit
 from .type_handlers import type_handlers
 from misc import reddit
 from typing import Union
-from utils import ChatStates
+from utils import ChatStates, sortby_kb
 
 
 def validate_subreddit(subreddit: str) -> Union[str, None]:
@@ -18,7 +18,10 @@ def validate_subreddit(subreddit: str) -> Union[str, None]:
 
 
 def validate_sortby(sortby: str) -> Union[Sort_Types, None]:
-    return Sort_Types.get(sortby.upper())
+    try:
+        return Sort_Types.get(sortby.upper())
+    except KeyError:
+        return None
 
 
 def validate_quantity(quantity: str) -> Union[int, None]:
@@ -53,8 +56,7 @@ async def command_show(message: types.Message):
         return
 
     # TODO: Make object wrapper for reddit
-    async for post in get_posts_from_subreddit(reddit, subreddit, sort_by,
-                                               quantity):
+    async for post in get_posts_from_subreddit(reddit, subreddit, sort_by, quantity):
         await type_handlers[post.type](message, post)
 
 
@@ -68,7 +70,7 @@ async def subreddit_input(message: types.Message, state: FSMContext):
         return
     await state.update_data(subreddit=subreddit)
     await ChatStates.next()
-    await message.answer("Sort by:")
+    await message.answer("Sort by:", reply_markup=sortby_kb)
 
 
 async def sortby_input(message: types.Message, state: FSMContext):
@@ -97,8 +99,8 @@ async def quantity_input(message: types.Message, state: FSMContext):
     input_sortby = input_data['sortby']
 
     # Return posts
-    async for post in get_posts_from_subreddit(reddit, input_subreddit,
-                                               input_sortby, input_quantity):
+    async for post in get_posts_from_subreddit(reddit, input_subreddit, input_sortby,
+                                               input_quantity):
         await type_handlers[post.type](message, post)
 
     await state.finish()

@@ -41,9 +41,8 @@ def get_post_type(post: Submission) -> Post_Types:
         return Post_Types.TEXT
     elif hasattr(post, 'is_video') and post.is_video:
         return Post_Types.VID
-    elif hasattr(post,
-                 'is_gallery') and hasattr(post, 'media_metadata') and hasattr(
-                     post, 'gallery_data') and post.is_gallery:
+    elif hasattr(post, 'is_gallery') and hasattr(post, 'media_metadata') and hasattr(
+            post, 'gallery_data') and post.is_gallery:
         return Post_Types.ALB
     elif post.url:
         try:
@@ -62,6 +61,7 @@ def get_post_type(post: Submission) -> Post_Types:
 # TODO: add id field
 @dataclass
 class Post_Data:
+    id: str
     title: str
     text: str
     url: str
@@ -86,7 +86,8 @@ async def get_post_by_url(reddit_obj: Reddit, url: str) -> Post_Data:
         post = await reddit_obj.submission(url=url)
     except InvalidURL as err:
         raise ValueError(err)
-    return Post_Data(title=post.title,
+    return Post_Data(id=post.id,
+                     title=post.title,
                      text=post.selftext,
                      url=post.url,
                      score=post.score,
@@ -102,7 +103,7 @@ class Sort_Types(Enum):
     TOP = 'top'
     NEW = 'new'
     RISING = 'rising'
-    RANDOM = 'random_rising'
+    RANDOM = 'random'
 
     @staticmethod
     def get(input_sortby: str):
@@ -113,8 +114,7 @@ class Sort_Types(Enum):
 
 
 async def get_posts_from_subreddit(
-        reddit_obj: Reddit, subreddit: Union[str,
-                                             Subreddit], sort_by: Sort_Types,
+        reddit_obj: Reddit, subreddit: Union[str, Subreddit], sort_by: Sort_Types,
         quantity: int) -> Optional[Generator[Post_Data, None, None]]:
     if isinstance(subreddit, str):
         try:
@@ -126,31 +126,28 @@ async def get_posts_from_subreddit(
 
     try:
         if sort_by != Sort_Types.RANDOM:
-            async for post in getattr(subreddit,
-                                      sort_by.value)(limit=quantity):
-                yield Post_Data(title=post.title,
+            async for post in getattr(subreddit, sort_by.value)(limit=quantity):
+                yield Post_Data(id=post.id,
+                                title=post.title,
                                 text=post.selftext,
                                 url=post.url,
                                 type=get_post_type(post),
                                 score=post.score,
                                 comments=post.num_comments,
-                                media_metadata=getattr(post, "media_metadata",
-                                                       None),
-                                gallery_data=getattr(post, "gallery_data",
-                                                     None))
+                                media_metadata=getattr(post, "media_metadata", None),
+                                gallery_data=getattr(post, "gallery_data", None))
         else:
             for _ in range(quantity):
                 post = await subreddit.random()
-                yield Post_Data(title=post.title,
+                yield Post_Data(id=post.id,
+                                title=post.title,
                                 text=post.selftext,
                                 url=post.url,
                                 type=get_post_type(post),
                                 score=post.score,
                                 comments=post.num_comments,
-                                media_metadata=getattr(post, "media_metadata",
-                                                       None),
-                                gallery_data=getattr(post, "gallery_data",
-                                                     None))
+                                media_metadata=getattr(post, "media_metadata", None),
+                                gallery_data=getattr(post, "gallery_data", None))
     except TypeError as err:
         logging.error(err)
         return

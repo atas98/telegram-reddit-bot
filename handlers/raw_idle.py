@@ -4,8 +4,6 @@ from misc import reddit
 from controllers.reddit import get_post_by_url
 from .type_handlers import type_handlers
 
-MAX_TELEGRAM_MESSAGE_LENGTH = 4000
-
 
 async def raw_idle(message: types.Message):
     try:

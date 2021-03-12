@@ -1,4 +1,5 @@
 from collections import defaultdict
+# TODO: move this stuff to json
 
 
 def get_language(lang_code: str) -> str:
@@ -8,17 +9,21 @@ def get_language(lang_code: str) -> str:
 
 en_text_start = """Hey there, fellow redditor 👋!"""
 
-en_text_help = """"I can't help your meanenless life 😞, but I can show my commads instead 😀 !\
-\n\t/show - to browse reddit posts \
-\n\t/login - to use reddit account 🚫 \
-\n\t/logout - to stop using all cool personized features 🚫 \
-\n\t/subscribe - to tell me that you need this memes regulary 🚫 \
+en_text_help = """
+/show - to browse reddit posts. You must specify subreddit, sorting type and quantity of posts to show\
+/cancel - to reset your input
 \n..or just give me url to reddit post so I can grab it for you"
 """
 
 ru_text_start = """Хей 👋"""
 
-ru_text_help = """Здесь таак пусто..."""
+ru_text_help = """Бот для взаимодействия с Реддитом.
+/show - возвращает выборку постов. Нужно указать сабреддит, вид сортировки и количество постов.
+\tСортировка: [hot, top, new, rising, random]
+\tНапример: /show memes top 10
+/cancel - что бы сбросить введенные данные
+\n..или or just give me url to reddit post so I can grab it for you"
+"""
 
 all_strings = {
     "en": {
