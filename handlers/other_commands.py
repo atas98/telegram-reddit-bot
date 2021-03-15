@@ -7,13 +7,15 @@ from utils import get_language, all_strings
 async def command_start(message: types.Message, state: FSMContext):
     # TODO: if logged in show keyboard
     await state.finish()
-    await message.answer(
-        all_strings.get(get_language(message.from_user.language_code)).get("start"))
+    await message.answer(all_strings.get(
+        get_language(message.from_user.language_code)).get("start"),
+                         disable_notification=True)
 
 
 async def command_help(message: types.Message):
-    await message.answer(
-        all_strings.get(get_language(message.from_user.language_code)).get("help"))
+    await message.answer(all_strings.get(
+        get_language(message.from_user.language_code)).get("help"),
+                         disable_notification=True)
 
 
 async def command_report(message: types.Message):
@@ -21,4 +23,4 @@ async def command_report(message: types.Message):
 
 
 async def command_cancel(message: types.Message, state: FSMContext):
-    state.finish()
+    await state.reset_state(with_data=False)

@@ -32,7 +32,7 @@ def quantity_kb() -> ReplyKeyboardMarkup:
         .row(btn_5, btn_10)
 
 
-def subreddit_kb(state: FSMContext) -> ReplyKeyboardMarkup:
+def subreddit_kb() -> ReplyKeyboardMarkup:
     return None
     # query to db about users last subs
     # if answer is None: return None

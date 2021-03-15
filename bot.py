@@ -1,10 +1,13 @@
 from utils import load_config
 from pathlib import Path
 import logging
+import os
 
 if __name__ == '__main__':
     # Configure logging
-    logging.basicConfig(level=logging.INFO, filename='dump.log')
+    if os.path.exists("./dump.log"):
+        os.remove("./dump.log")
+    logging.basicConfig(level=logging.DEBUG, filename='dump.log')
 
     # Initialize and check config
     try:

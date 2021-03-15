@@ -66,6 +66,7 @@ class Post_Data:
     title: str
     text: str
     url: str
+    post_link: str
     type: Post_Types
     nsfw: bool
     score: int
@@ -91,7 +92,8 @@ async def get_post_by_url(reddit_obj: Reddit, url: str) -> Post_Data:
     return Post_Data(id=post.id,
                      title=post.title,
                      text=post.selftext,
-                     url=post.permalink,
+                     url=post.url,
+                     post_link=get_post_link(post),
                      score=post.score,
                      comments=post.num_comments,
                      type=get_post_type(post),
@@ -135,6 +137,7 @@ async def get_posts_from_subreddit(
                                 title=post.title,
                                 text=post.selftext,
                                 url=post.url,
+                                post_link=get_post_link(post),
                                 type=get_post_type(post),
                                 score=post.score,
                                 nsfw=post.over_18,
@@ -150,6 +153,7 @@ async def get_posts_from_subreddit(
                                 title=post.title,
                                 text=post.selftext,
                                 url=post.url,
+                                post_link=get_post_link(post),
                                 type=get_post_type(post),
                                 nsfw=post.over_18,
                                 score=post.score,
@@ -169,3 +173,7 @@ def photos_from_album(post: Post_Data) -> Generator[str, None, None]:
         url = post.media_metadata[id]['p'][0]['u']
         url = url.split("?")[0].replace("preview", "i")
         yield url
+
+
+def get_post_link(post: Submission) -> str:
+    return "https://www.reddit.com" + post.permalink

@@ -43,10 +43,13 @@ async def command_show(message: types.Message):
     args = message.get_args().split()
     if not args:
         await ChatStates.INP_SUBREDDIT.set()
-        await message.answer("Subreddit:", reply_markup=subreddit_kb)
+        await message.answer("Subreddit:",
+                             reply_markup=subreddit_kb(),
+                             disable_notification=True)
         return  # Start input session Sub -> Sortby -> Quantity
     if len(args) != 3:
-        await message.answer("Oopsie, wrong arguments here")
+        await message.answer("Oopsie, wrong arguments here",
+                             disable_notification=True)
         return
 
     subreddit, sort_by, quantity = args
@@ -55,7 +58,8 @@ async def command_show(message: types.Message):
     quantity = validate_quantity(quantity)
 
     if not subreddit or not sort_by or not quantity:
-        await message.answer("Oopsie, wrong arguments here")
+        await message.answer("Oopsie, wrong arguments here",
+                             disable_notification=True)
         return
 
     # TODO: Make object wrapper for reddit
@@ -69,32 +73,36 @@ async def subreddit_input(message: types.Message, state: FSMContext):
     # TODO: Check if sub exists
     if not subreddit:
         await message.answer(
-            "What are u trying to tell me? I dont understand. You can try again or fuck yourself"
-        )
+            "What are u trying to tell me? I dont understand. You can try again or fuck yourself",
+            disable_notification=True)
         return
     await state.update_data(subreddit=subreddit)
     await ChatStates.next()
-    await message.answer("Sort by:", reply_markup=sortby_kb)
+    await message.answer("Sort by:",
+                         reply_markup=sortby_kb(),
+                         disable_notification=True)
 
 
 async def sortby_input(message: types.Message, state: FSMContext):
     sortby = validate_sortby(message.text)
     if not sortby:
         await message.answer(
-            "What are u trying to tell me? I dont understand. You can try again or fuck yourself"
-        )
+            "What are u trying to tell me? I dont understand. You can try again or fuck yourself",
+            disable_notification=True)
         return
     await state.update_data(sortby=sortby)
     await ChatStates.next()
-    await message.answer("Quantity:", reply_markup=quantity_kb)
+    await message.answer("Quantity:",
+                         reply_markup=quantity_kb(),
+                         disable_notification=True)
 
 
 async def quantity_input(message: types.Message, state: FSMContext):
     input_quantity = validate_quantity(message.text)
     if not input_quantity:
         await message.answer(
-            "What are u trying to tell me? I dont understand. You can try again or fuck yourself"
-        )
+            "What are u trying to tell me? I dont understand. You can try again or fuck yourself",
+            disable_notification=True)
         return
 
     # Retrive data from state
