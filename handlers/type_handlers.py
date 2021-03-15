@@ -2,6 +2,7 @@ from controllers.reddit.reddit import Post_Data
 from aiogram import types
 from aiogram.utils.exceptions import (MessageIsTooLong, WrongFileIdentifier,
                                       InvalidHTTPUrlContent)
+from utils.keyboards import post_data_kb
 from typing import Generator
 from controllers.reddit import photos_from_album, Post_Types
 
@@ -17,7 +18,9 @@ def _text_chunks(text: str, chunk_size: int) -> Generator[str, None, None]:
 
 async def text_post_handler(message: types.Message, post: Post_Data):
     try:
-        await message.answer(f"<b>{post.title}</b>\n{post.text}", parse_mode="html")
+        await message.answer(f"<b>{post.title}</b>\n{post.text}",
+                             parse_mode="html",
+                             reply_markup=post_data_kb(post.url, post.id))
     except MessageIsTooLong:
         await message.answer(f"<b>{post.title}</b>", parse_mode="html")
         for text_chunk in _text_chunks(post.text, MAX_TELEGRAM_MESSAGE_LENGTH):
@@ -34,7 +37,8 @@ async def video_post_handler(message: types.Message, post: Post_Data):
     try:
         await message.answer_video(post.url, caption=post.title)
     except InvalidHTTPUrlContent:
-        await message.answer("Thats not a video, you liar!.. At least I think so 😕 .\
+        await message.answer(
+            "Thats not a video, you liar!.. At least I think so 😕 .\
             Here's your link anyways:")
         await link_post_handler(message, post)
     except WrongFileIdentifier:

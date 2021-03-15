@@ -18,4 +18,6 @@ if __name__ == '__main__':
     from handlers import register_bot_commands
 
     # TODO: Switch polling to webhooks
-    executor.start_polling(dp, skip_updates=True, on_startup=register_bot_commands)
+    executor.start_polling(dp,
+                           skip_updates=True,
+                           on_startup=register_bot_commands)

@@ -41,8 +41,9 @@ def get_post_type(post: Submission) -> Post_Types:
         return Post_Types.TEXT
     elif hasattr(post, 'is_video') and post.is_video:
         return Post_Types.VID
-    elif hasattr(post, 'is_gallery') and hasattr(post, 'media_metadata') and hasattr(
-            post, 'gallery_data') and post.is_gallery:
+    elif hasattr(post,
+                 'is_gallery') and hasattr(post, 'media_metadata') and hasattr(
+                     post, 'gallery_data') and post.is_gallery:
         return Post_Types.ALB
     elif post.url:
         try:
@@ -58,7 +59,7 @@ def get_post_type(post: Submission) -> Post_Types:
 
 
 # TODO: Move all dataclasses/enums to separate file
-# TODO: add id field
+# TODO: Generator to take comments from submission
 @dataclass
 class Post_Data:
     id: str
@@ -66,6 +67,7 @@ class Post_Data:
     text: str
     url: str
     type: Post_Types
+    nsfw: bool
     score: int
     comments: int
     media_metadata: typing.List[Any]
@@ -89,10 +91,11 @@ async def get_post_by_url(reddit_obj: Reddit, url: str) -> Post_Data:
     return Post_Data(id=post.id,
                      title=post.title,
                      text=post.selftext,
-                     url=post.url,
+                     url=post.permalink,
                      score=post.score,
                      comments=post.num_comments,
                      type=get_post_type(post),
+                     nsfw=post.over_18,
                      media_metadata=getattr(post, "media_metadata", None),
                      gallery_data=getattr(post, "gallery_data", None))
 
@@ -103,7 +106,7 @@ class Sort_Types(Enum):
     TOP = 'top'
     NEW = 'new'
     RISING = 'rising'
-    RANDOM = 'random'
+    RANDOM = 'random-rising'
 
     @staticmethod
     def get(input_sortby: str):
@@ -114,7 +117,8 @@ class Sort_Types(Enum):
 
 
 async def get_posts_from_subreddit(
-        reddit_obj: Reddit, subreddit: Union[str, Subreddit], sort_by: Sort_Types,
+        reddit_obj: Reddit, subreddit: Union[str,
+                                             Subreddit], sort_by: Sort_Types,
         quantity: int) -> Optional[Generator[Post_Data, None, None]]:
     if isinstance(subreddit, str):
         try:
@@ -133,9 +137,12 @@ async def get_posts_from_subreddit(
                                 url=post.url,
                                 type=get_post_type(post),
                                 score=post.score,
+                                nsfw=post.over_18,
                                 comments=post.num_comments,
-                                media_metadata=getattr(post, "media_metadata", None),
-                                gallery_data=getattr(post, "gallery_data", None))
+                                media_metadata=getattr(post, "media_metadata",
+                                                       None),
+                                gallery_data=getattr(post, "gallery_data",
+                                                     None))
         else:
             for _ in range(quantity):
                 post = await subreddit.random()
@@ -144,10 +151,13 @@ async def get_posts_from_subreddit(
                                 text=post.selftext,
                                 url=post.url,
                                 type=get_post_type(post),
+                                nsfw=post.over_18,
                                 score=post.score,
                                 comments=post.num_comments,
-                                media_metadata=getattr(post, "media_metadata", None),
-                                gallery_data=getattr(post, "gallery_data", None))
+                                media_metadata=getattr(post, "media_metadata",
+                                                       None),
+                                gallery_data=getattr(post, "gallery_data",
+                                                     None))
     except TypeError as err:
         logging.error(err)
         return
@@ -159,8 +169,3 @@ def photos_from_album(post: Post_Data) -> Generator[str, None, None]:
         url = post.media_metadata[id]['p'][0]['u']
         url = url.split("?")[0].replace("preview", "i")
         yield url
-
-
-# TODO: auth with refreshToken
-# def authenticateReddit(client_id, client_secret, user_agent):
-#   pass

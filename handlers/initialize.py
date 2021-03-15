@@ -3,6 +3,7 @@ from .other_commands import command_start, command_help, command_report
 from .show_command import (command_show, subreddit_input, sortby_input,
                            quantity_input)
 from .raw_idle import raw_idle
+from .inline_handlers import comments_bnt_callback
 from utils.states import ChatStates
 
 
@@ -11,10 +12,16 @@ def initialize_handlers(dp: Dispatcher):
     dp.register_message_handler(command_help, commands=["help"])
     dp.register_message_handler(command_report, commands=["report"])
     dp.register_message_handler(command_show, commands=["show"])
+
     dp.register_message_handler(subreddit_input, state=ChatStates.INP_SUBREDDIT)
     dp.register_message_handler(sortby_input, state=ChatStates.INP_SORTBY)
     dp.register_message_handler(quantity_input, state=ChatStates.INP_QUANTITY)
+
     dp.register_message_handler(raw_idle, content_types=["text"], state="*")
+
+    dp.register_callback_query_handler(
+        comments_bnt_callback,
+        lambda c: c.data and c.data.startswith('post_comments:'))
 
 
 async def register_bot_commands(dp: Dispatcher):

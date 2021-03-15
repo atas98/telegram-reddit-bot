@@ -4,15 +4,18 @@ from controllers.reddit import Sort_Types, get_posts_from_subreddit
 from .type_handlers import type_handlers
 from misc import reddit
 from typing import Union
-from utils import ChatStates, sortby_kb
+from utils import ChatStates
+from utils.keyboards import subreddit_kb, sortby_kb, quantity_kb
 
 
 def validate_subreddit(subreddit: str) -> Union[str, None]:
     # Max subreddit name length is 21char, and min is 2
-    if 2 > len(subreddit) > 23:
+    MIN_LENGTH = 1
+    MAX_LENGTH = 21
+    if subreddit[:2] == 'r/':
+        subreddit = subreddit[2:]
+    if MIN_LENGTH > len(subreddit) > MAX_LENGTH:
         return None
-    elif subreddit[:2] == 'r/':
-        return subreddit[2:]
     else:
         return subreddit
 
@@ -40,7 +43,7 @@ async def command_show(message: types.Message):
     args = message.get_args().split()
     if not args:
         await ChatStates.INP_SUBREDDIT.set()
-        await message.answer("Subreddit:")
+        await message.answer("Subreddit:", reply_markup=subreddit_kb)
         return  # Start input session Sub -> Sortby -> Quantity
     if len(args) != 3:
         await message.answer("Oopsie, wrong arguments here")
@@ -56,7 +59,8 @@ async def command_show(message: types.Message):
         return
 
     # TODO: Make object wrapper for reddit
-    async for post in get_posts_from_subreddit(reddit, subreddit, sort_by, quantity):
+    async for post in get_posts_from_subreddit(reddit, subreddit, sort_by,
+                                               quantity):
         await type_handlers[post.type](message, post)
 
 
@@ -82,7 +86,7 @@ async def sortby_input(message: types.Message, state: FSMContext):
         return
     await state.update_data(sortby=sortby)
     await ChatStates.next()
-    await message.answer("Quantity:")
+    await message.answer("Quantity:", reply_markup=quantity_kb)
 
 
 async def quantity_input(message: types.Message, state: FSMContext):
@@ -99,8 +103,8 @@ async def quantity_input(message: types.Message, state: FSMContext):
     input_sortby = input_data['sortby']
 
     # Return posts
-    async for post in get_posts_from_subreddit(reddit, input_subreddit, input_sortby,
-                                               input_quantity):
+    async for post in get_posts_from_subreddit(reddit, input_subreddit,
+                                               input_sortby, input_quantity):
         await type_handlers[post.type](message, post)
 
     await state.finish()
