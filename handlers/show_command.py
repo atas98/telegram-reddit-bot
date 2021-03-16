@@ -1,6 +1,6 @@
 from aiogram import types
 from aiogram.dispatcher import FSMContext
-from controllers.reddit import Sort_Types, get_posts_from_subreddit
+from controllers.reddit import Sort_Types
 from .type_handlers import type_handlers
 from misc import reddit
 from typing import Union
@@ -62,9 +62,8 @@ async def command_show(message: types.Message):
                              disable_notification=True)
         return
 
-    # TODO: Make object wrapper for reddit
-    async for post in get_posts_from_subreddit(reddit, subreddit, sort_by,
-                                               quantity):
+    async for post in reddit.get_posts_from_subreddit(subreddit, sort_by,
+                                                      quantity):
         await type_handlers[post.type](message, post)
 
 
@@ -111,8 +110,9 @@ async def quantity_input(message: types.Message, state: FSMContext):
     input_sortby = input_data['sortby']
 
     # Return posts
-    async for post in get_posts_from_subreddit(reddit, input_subreddit,
-                                               input_sortby, input_quantity):
+    async for post in reddit.get_posts_from_subreddit(input_subreddit,
+                                                      input_sortby,
+                                                      input_quantity):
         await type_handlers[post.type](message, post)
 
     await state.finish()

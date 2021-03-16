@@ -6,7 +6,6 @@ from .other_commands import (command_start, command_help, command_report,
 from .show_command import (command_show, subreddit_input, sortby_input,
                            quantity_input)
 from .raw_idle import raw_idle
-from .inline_handlers import comments_bnt_callback
 from .stickers import sticker_handler
 from utils.states import ChatStates
 
@@ -29,19 +28,15 @@ def initialize_handlers(dp: Dispatcher):
     dp.register_message_handler(sticker_handler,
                                 content_types=ContentTypes.STICKER)
 
-    # dp.register_callback_query_handler(
-    #     comments_bnt_callback,
-    #     lambda c: c.data and c.data.startswith('post_comments:'))
-
 
 async def register_bot_commands(dp: Dispatcher):
     initialize_handlers(dp)
     commands = [
-        types.BotCommand(command="help", description="help and source code"),
-        types.BotCommand(command="report", description="report bug"),
-        types.BotCommand(command="cancel", description="to reset input"),
         types.BotCommand(
             command="show",
-            description="get a bunch of posts from specified subreddit")
+            description="get a bunch of posts from specified subreddit"),
+        types.BotCommand(command="report", description="report bug"),
+        types.BotCommand(command="cancel", description="to reset input"),
+        types.BotCommand(command="help", description="help and source code")
     ]
     await dp.bot.set_my_commands(commands)

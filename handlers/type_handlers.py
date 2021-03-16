@@ -1,17 +1,17 @@
-from controllers.reddit.reddit import Post_Data
 from aiogram import types
 from aiogram.utils.exceptions import (MessageIsTooLong, WrongFileIdentifier,
                                       InvalidHTTPUrlContent)
 from utils.keyboards import post_data_kb
 from typing import Generator
-from controllers.reddit import photos_from_album, Post_Types
+from controllers.reddit import Post_Data, Post_Types, Reddit
 
 MAX_TELEGRAM_MESSAGE_LENGTH = 4000
 
 
 def _text_chunks(text: str, chunk_size: int) -> Generator[str, None, None]:
-    # TODO: mind words, split by spaces
-    # Smth like, split by the most right space if its not beyond certain ratio of textP
+    # notTODO: mind words, split by spaces. Fuck that
+    # Smth like, split by the most right space
+    # if its not beyond certain ratio of textP
     for i in range(0, len(text), chunk_size):
         yield text[i:i + chunk_size]
 
@@ -32,7 +32,6 @@ async def text_post_handler(message: types.Message, post: Post_Data):
 
 async def picture_post_handler(message: types.Message, post: Post_Data):
     # TODO: capture FileIsTooFBig exception
-    # TODO: except aiogram.utils.exceptions.URLHostIsEmpty
     await message.answer_photo(post.url,
                                caption=post.title,
                                reply_markup=post_data_kb(post.post_link),
@@ -40,7 +39,7 @@ async def picture_post_handler(message: types.Message, post: Post_Data):
 
 
 async def video_post_handler(message: types.Message, post: Post_Data):
-    # FIXME: parse post.media
+    # TODO: parse post.media
     try:
         await message.answer_video(post.url,
                                    caption=post.title,
@@ -59,11 +58,9 @@ async def video_post_handler(message: types.Message, post: Post_Data):
 
 
 async def album_post_handler(message: types.Message, post: Post_Data):
-    # album = types.InputMediaGroup()
     album = []
-    for i, url in enumerate(photos_from_album(post)):
+    for i, url in enumerate(Reddit.photos_from_album(post)):
         if i == 0:
-            # album.attach_photo(url, caption=post.title)
             album.append(types.InputMediaPhoto(url, caption=post.title))
         else:
             album.append(types.InputMediaPhoto(url))
@@ -93,7 +90,6 @@ async def link_post_handler(message: types.Message, post: Post_Data):
 
 
 async def unknown_post_handler(message: types.Message, post: Post_Data):
-    # TODO: Add to all_strigs w/ localization
     await message.answer("Hey, thats illegal! (post type) 👮 ",
                          disable_notification=True)
 
