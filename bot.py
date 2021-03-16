@@ -5,8 +5,8 @@ import os
 
 if __name__ == '__main__':
     # Configure logging
-    if os.path.exists("./dump.log"):
-        os.remove("./dump.log")
+    if os.path.exists("./.log"):
+        os.remove("./.log")
     logging.basicConfig(level=logging.DEBUG, filename='dump.log')
 
     # Initialize and check config
