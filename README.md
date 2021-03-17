@@ -30,8 +30,9 @@ Telegram bot for retrieving reddit posts content
   - [ ] - keyboard for subreddit (keep track of favorite posts) 
   - [x] - keyboard for sort types 
   - [x] - keyboard for quantity
+- [ ] - Form messages file w/ locals
 - [ ] - Connect MongoDB for subscriptions
 - [ ] - /subscribe
 - [ ] - Swicth local storage to Redis
 - [ ] - Dockerize app 
-- [ ] - Deploy to heroku 
+- [ ] - Deploy to heroku
