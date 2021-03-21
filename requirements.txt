@@ -1,3 +1,4 @@
 requests
 asyncpraw
 aiogram
+motor
