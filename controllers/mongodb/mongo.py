@@ -1,14 +1,18 @@
-import motor.motor_asyncio
+import logging
+from motor.motor_asyncio import AsyncIOMotorClient
 from dataclasses import dataclass, asdict
 from enum import Enum, unique
-from typing import Tuple, Union, List
+from typing import Union, List, Dict
+
 
 @dataclass
 class UserData:
-    user_id: str # telegram chat id for user
-    favorites: List[Dict[str, Union[str, bool]]] # list of dicts (subreddit id, locked)
-    timezone: int # integer in range [-24:24]
-    
+    user_id: str  # telegram chat id for user
+    favorites: List[Dict[str,
+                         Union[str,
+                               bool]]]  # list of dicts (subreddit id, locked)
+    timezone: int  # integer in range [-24:24]
+
 
 class Mongo:
 
@@ -19,72 +23,72 @@ class Mongo:
         self._IP = IP
         self._PORT = PORT
 
-        self._db = motor.motor_asyncio.AsyncIOMotorClient(IP, PORT)['telegram_reddit_bot_db']
+        self._db = AsyncIOMotorClient(IP, PORT)['telegram_reddit_bot_db']
         self.user_collection = self._db['user_collection']
 
-
-    def new_user(self, user_data: UserData):
+    async def new_user(self, user_data: UserData):
         try:
             await self.user_collection.insert_one(asdict(user_data))
         except Exception as err:
-            logging.error()
+            logging.error(err)
 
-    def delete_user(self, user_id: str)
+    async def delete_user(self, user_id: str):
         try:
             await self.user_collection.delete_one({'user_id': user_id})
         except Exception as err:
-            logging.error()
+            logging.error(err)
 
-    def set_time_zone(self, user_id: str, timezone: int):
+    async def set_time_zone(self, user_id: str, timezone: int):
         try:
-            await self.user_collection.update_one({'user_id': user_id}, 
-                                                    {'$set': 
-                                                        {'timezone': timezone}
-                                                    })
+            await self.user_collection.update_one(
+                {'user_id': user_id}, {'$set': {
+                    'timezone': timezone
+                }})
         except Exception as err:
-            logging.error()
+            logging.error(err)
 
-    def get_favorites(self, user_id: str) -> Union[List[str], None]:
+    async def get_favorites(self, user_id: str) -> Union[List[str], None]:
         try:
-            await self.user_collection.find_one({'user_id': user_id}, 
-                                                {'favorites': 1}).keys()
+            return await self.user_collection.find_one({
+                'user_id': user_id
+            }, {
+                'favorites': 1
+            }).keys()
         except Exception as err:
             logging.error(err)
             return None
 
-        
-    def push_favorite(self, user_id: str, sub_name: str, locked: bool = False):
-        user_favorites = await self.user_collection.find_one({'user_id': user}, 
-                                                             {'favorites': 1}) # Check type of result
-        user_favorites
+    async def push_favorite(self,
+                            user_id: str,
+                            sub_id: str,
+                            locked: bool = False):
+        user_favorites = await self.user_collection.find_one(
+            {'user_id': user_id},
+            {'favorites': 1})['favorites'
+                             ]  # TODO: Check type of result (list or dict)
+        user_favorites = user_favorites.pop(0).append(sub_id, locked)
+        await self.user_collection.update_one(
+            {'user_id': user_id}, {'$set': {
+                'favorites': user_favorites
+            }})
 
-    def lock_favorite(self, user_id: str, sub_name: str):
+    async def lock_favorite(self, user_id: str, sub_name: str):
         try:
-            await self.user_collection.update_one({
-                                                   'user_id': user_id, 
-                                                   'favorites.subreddit': sub_name
-                                                  }, 
-                                                  {
-                                                      '$set': {
-                                                        'favorites.$.locked', 
-                                                        True
-                                                      }
-                                                  })
+            await self.user_collection.update_one(
+                {
+                    'user_id': user_id,
+                    'favorites.subreddit': sub_name
+                }, {'$set': {'favorites.$.locked', True}})
         except Exception as err:
             logging.error(err)
 
-    def unlock_favorite(self, user_id: str, sub_name: str):
-                try:
-            await self.user_collection.update_one({
-                                                   'user_id': user_id, 
-                                                   'favorites.subreddit': sub_name
-                                                  }, 
-                                                  {
-                                                      '$set': {
-                                                        'favorites.$.locked', 
-                                                        False
-                                                      }
-                                                  })
+    async def unlock_favorite(self, user_id: str, sub_name: str):
+        try:
+            await self.user_collection.update_one(
+                {
+                    'user_id': user_id,
+                    'favorites.subreddit': sub_name
+                }, {'$set': {'favorites.$.locked', False}})
         except Exception as err:
             logging.error(err)
 
