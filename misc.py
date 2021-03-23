@@ -1,30 +1,17 @@
 import asyncio
-from utils.load_config import CONFIG
+import logging
 from aiogram import Bot, Dispatcher
 from aiogram.contrib.fsm_storage.redis import RedisStorage2
-# from aiogram.contrib.fsm_storage.memory import MemoryStorage
+from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from controllers.reddit import Reddit
-from handlers import register_bot_commands
-
-loop = asyncio.get_event_loop()
-WEBHOOK_URL = f"https://{CONFIG.webhook.HOST}:{CONFIG.webhook.PORT}{CONFIG.webhook.URL_PATH}"
-
-# Initialize bot and dispatcher
-reddit = Reddit(CONFIG.reddit.client_id, CONFIG.reddit.client_secret,
-                CONFIG.reddit.user_agent)
-bot = Bot(token=CONFIG.telegramToken,
-          parse_mode="HTML",
-          validate_token=True,
-          loop=loop)
-dp = Dispatcher(bot,
-                storage=RedisStorage2(host=CONFIG.redis.HOST,
-                                      port=CONFIG.redis.PORT,
-                                      db=CONFIG.redis.DB,
-                                      password=CONFIG.redis.PASSWORD))
+from utils.load_config import CONFIG
 
 
-async def on_startup():
-    await register_bot_commands()
+async def on_startup(app):
+    from handlers import register_bot_commands
+    await register_bot_commands(dp)
+    print("Commands registered")
+    logging.info("Commands registered")
 
     # Get current webhook status
     webhook = await bot.get_webhook_info()
@@ -40,7 +27,7 @@ async def on_startup():
                               certificate=open(CONFIG.ssl.CERT, 'rb'))
 
 
-async def on_shutdown():
+async def on_shutdown(app):
     """
     Graceful shutdown. This method is recommended by aiohttp docs.
     """
@@ -50,3 +37,18 @@ async def on_shutdown():
     # Close Redis connection.
     await dp.storage.close()
     await dp.storage.wait_closed()
+
+
+# loop = asyncio.get_event_loop()
+
+# Initialize bot and dispatcher
+reddit = Reddit(CONFIG.reddit.client_id, CONFIG.reddit.client_secret,
+                CONFIG.reddit.user_agent)
+bot = Bot(token=CONFIG.telegramToken, parse_mode="HTML", validate_token=True)
+dp = Dispatcher(bot,
+                storage=RedisStorage2(host=CONFIG.redis.HOST,
+                                      port=CONFIG.redis.PORT,
+                                      db=CONFIG.redis.DB))
+#   password=CONFIG.redis.PASSWORD))
+
+WEBHOOK_URL = f"https://{CONFIG.webhook.HOST}:{CONFIG.webhook.PORT}{CONFIG.webhook.URL_PATH}"

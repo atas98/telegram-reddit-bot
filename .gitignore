@@ -1,4 +1,4 @@
-config.json
+/config/*
 __pycache__
 __old__
 *.log

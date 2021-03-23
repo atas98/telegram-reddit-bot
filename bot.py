@@ -19,18 +19,20 @@ if __name__ == '__main__':
         exit(f"Error: {ex}")
 
     # Now load everything else
-    # from aiogram import executor
-    from misc import dp, WEBHOOK_URL_PATH, on_startup, on_shutdown
+    from aiogram import executor
     from utils.load_config import CONFIG
+    from misc import dp, on_startup, on_shutdown  #, loop
+    from handlers import register_bot_commands
 
     # Get instance of :class:`aiohttp.web.Application` with configured router.
-    app = get_new_configured_app(dispatcher=dp, path=WEBHOOK_URL_PATH)
+    app = get_new_configured_app(dispatcher=dp, path=CONFIG.webhook.URL_PATH)
 
     # Setup event handlers.
     app.on_startup.append(on_startup)
     app.on_shutdown.append(on_shutdown)
 
     # Generate SSL context
+    # TODO: generate selfsigned sertificates
     context = ssl.SSLContext(ssl.PROTOCOL_TLSv1_2)
     context.load_cert_chain(CONFIG.ssl.CERT, CONFIG.ssl.PRIV)
 
@@ -39,3 +41,7 @@ if __name__ == '__main__':
                 host=CONFIG.webapp.HOST,
                 port=CONFIG.webapp.PORT,
                 ssl_context=context)
+
+    # executor.start_polling(dp,
+    #                        skip_updates=True,
+    #                        on_startup=register_bot_commands)

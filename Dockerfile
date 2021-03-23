@@ -6,4 +6,6 @@ COPY requirements.txt /telegram-reddit-bot/
 RUN pip install -r /telegram-reddit-bot/requirements.txt
 COPY . /telegram-reddit-bot/
 
+EXPOSE 443
+
 CMD python3 /telegram-reddit-bot/bot.py

@@ -24,7 +24,7 @@ class Post_Types(Enum):
 
 
 @unique
-class Sort_Types(Enum):
+class Sort_Types(str, Enum):
     HOT = 'hot'
     TOP = 'top'
     NEW = 'new'
@@ -136,8 +136,7 @@ class Reddit(object):
 
         try:
             if sort_by != Sort_Types.RANDOM:
-                async for post in getattr(subreddit,
-                                          sort_by.value)(limit=quantity):
+                async for post in getattr(subreddit, sort_by)(limit=quantity):
                     yield Post_Data(
                         id=post.id,
                         title=post.title,
