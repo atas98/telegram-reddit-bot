@@ -28,7 +28,7 @@ def validate_sortby(sortby: str) -> Union[Sort_Types, None]:
 
 
 def validate_quantity(quantity: str) -> Union[int, None]:
-    MIN_QUANTITY = 1
+    MIN_QUANTITY = 1  # TODO: Move to config
     MAX_QUANTITY = 10
     if not quantity.isnumeric():
         return quantity
@@ -39,12 +39,12 @@ def validate_quantity(quantity: str) -> Union[int, None]:
         return quantity
 
 
-async def command_show(message: types.Message):
+async def command_show(message: types.Message, state: FSMContext):
     args = message.get_args().split()
     if not args:
         await ChatStates.INP_SUBREDDIT.set()
         await message.answer("Subreddit:",
-                             reply_markup=subreddit_kb(),
+                             reply_markup=await subreddit_kb(state),
                              disable_notification=True)
         return  # Start input session Sub -> Sortby -> Quantity
     if len(args) != 3:
@@ -65,6 +65,20 @@ async def command_show(message: types.Message):
     async for post in reddit.get_posts_from_subreddit(subreddit, sort_by,
                                                       quantity):
         await type_handlers[post.type](message, post)
+        # TODO: Append 'more' button to last post
+
+
+async def _update_favorites(state: FSMContext, subreddit: str):
+    default = ["memes", "games", "aww", "pics", "gifs", "worldnews"]
+    favorites = await state.get_data()
+    try:
+        favorites = favorites['favorites']
+    except KeyError:
+        favorites = []
+    if len(favorites
+          ) < 6 and subreddit not in favorites and subreddit not in default:
+        favorites.append(subreddit)
+    await state.update_data(favorites=favorites)
 
 
 async def subreddit_input(message: types.Message, state: FSMContext):
@@ -76,6 +90,8 @@ async def subreddit_input(message: types.Message, state: FSMContext):
             disable_notification=True)
         return
     await state.update_data(subreddit=subreddit)
+    await _update_favorites(state, subreddit)
+
     await ChatStates.next()
     await message.answer("Sort by:",
                          reply_markup=sortby_kb(),
@@ -115,4 +131,4 @@ async def quantity_input(message: types.Message, state: FSMContext):
                                                       input_quantity):
         await type_handlers[post.type](message, post)
 
-    await state.finish()
+    await state.reset_state(with_data=False)

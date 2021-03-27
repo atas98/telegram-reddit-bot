@@ -1,6 +1,8 @@
 from aiogram.types import (ReplyKeyboardMarkup, KeyboardButton,
                            InlineKeyboardMarkup, InlineKeyboardButton)
 from aiogram.dispatcher import FSMContext
+from typing import List
+import logging
 
 
 def sortby_kb() -> ReplyKeyboardMarkup:
@@ -15,7 +17,7 @@ def sortby_kb() -> ReplyKeyboardMarkup:
         .row(btn_random)
 
 
-def post_data_kb(post_url: str) -> InlineKeyboardMarkup:
+def post_url_kb(post_url: str) -> InlineKeyboardMarkup:
     inline_btn_url = InlineKeyboardButton('Open on reddit', url=post_url)
     return InlineKeyboardMarkup(row_width=1)\
         .add(inline_btn_url)
@@ -32,8 +34,33 @@ def quantity_kb() -> ReplyKeyboardMarkup:
         .row(btn_5, btn_10)
 
 
-def subreddit_kb() -> ReplyKeyboardMarkup:
-    return None
-    # query to db about users last subs
-    # if answer is None: return None
-    # else return kb with last sub choices
+async def _get_favorites(state: FSMContext) -> List[str]:
+    default = ["memes", "games", "aww", "pics", "gifs",
+               "worldnews"]  # TODO: move to config
+    try:
+        favorites = await state.get_data()
+        favorites = favorites['favorites']
+    except KeyError:
+        return default
+    else:
+        try:
+            return default[:len(default) - len(favorites)] + favorites
+        except Exception as err:
+            logging.error(err)
+            return default
+
+
+async def subreddit_kb(state: FSMContext) -> ReplyKeyboardMarkup:
+    favorites = await _get_favorites(state)
+
+    btn_1 = KeyboardButton(favorites[0])
+    btn_2 = KeyboardButton(favorites[1])
+    btn_3 = KeyboardButton(favorites[2])
+    btn_4 = KeyboardButton(favorites[3])
+    btn_5 = KeyboardButton(favorites[4])
+    btn_6 = KeyboardButton(favorites[5])
+    return ReplyKeyboardMarkup(resize_keyboard=True,
+                               one_time_keyboard=True)\
+        .row(btn_1, btn_2)\
+        .row(btn_3, btn_4)\
+        .row(btn_5, btn_6)

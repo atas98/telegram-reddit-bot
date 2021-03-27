@@ -13,7 +13,7 @@ from utils.states import ChatStates
 def initialize_handlers(dp: Dispatcher):
     dp.register_message_handler(command_start, commands=["start"])
     dp.register_message_handler(command_help, commands=["help"])
-    dp.register_message_handler(command_cancel, commands=["cancel"])
+    dp.register_message_handler(command_cancel, commands=["cancel"], state="*")
     dp.register_message_handler(command_report, commands=["report"])
     dp.register_message_handler(command_show, commands=["show"])
 
