@@ -21,7 +21,7 @@ en_text_help = """
 
 en_input_inv_subreddit = "Subreddit:"
 en_input_inv_sortby = "Sortby:"
-en_input_inv_quanitity = "Quantity:"
+en_input_inv_quantity = "Quantity:"
 
 en_error_wrong_args = "Oopsie, wrong arguments here 🤨"
 en_error_file_2_big = "Step Dad, what are u doing!? Its too big!! 🤯 "
@@ -58,7 +58,7 @@ all_strings = {
         "help": en_text_help,
         "input_inv_subreddit": en_input_inv_subreddit,
         "input_inv_sortby": en_input_inv_sortby,
-        "input_inv_quantity": en_input_inv_quanitity,
+        "input_inv_quantity": en_input_inv_quantity,
         "error_wrong_args": en_error_wrong_args,
         "error_file_2_big": en_error_file_2_big,
         "error_wrong_post_type": en_error_wrong_post_type,
@@ -70,7 +70,7 @@ all_strings = {
         "help": ru_text_help,
         "input_inv_subreddit": ru_input_inv_subreddit,
         "input_inv_sortby": ru_input_inv_sortby,
-        "input_inv_quantity": ru_input_inv_quanitity,
+        "input_inv_quantity": ru_input_inv_quantity,
         "error_wrong_args": ru_error_wrong_args,
         "error_file_2_big": ru_error_file_2_big,
         "error_wrong_post_type": ru_error_wrong_post_type,
