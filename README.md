@@ -1,6 +1,6 @@
 # telegram-reddit-bot
 
-Telegram bot for retrieving reddit posts content
+Telegram bot for retrieving reddit posts content. Telegram: [@RedditBot](https://t.me/atasrdtpeeperbot)
 
 ## Commands
 
@@ -10,14 +10,9 @@ Telegram bot for retrieving reddit posts content
   2. **orderby** -> _hot_ or _new_ or _best_ or _top_
   3. **quantity** -> number of posts to show
      _Example:_ /show memes random 3
-- **/subscribe** -> send new posts every N minutes (max 6 or someth)
-  _Example:_ /subscribe r/aww
-- **/show_subscribtions** -> show list of subscriptions
-- **/unsubscribe** ->
 - **/settings** ->
   1. Manage favorite subreddits (for subreddit_kb)
-  2. Manage subscription feed refreshment time
-  3. Manage sub feed time interval
+  2. Manage language
 
 ## Roadmap
 
