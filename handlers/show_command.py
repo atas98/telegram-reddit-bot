@@ -7,6 +7,7 @@ from misc import reddit
 from typing import Union
 from utils import ChatStates
 from utils.keyboards import subreddit_kb, sortby_kb, quantity_kb
+from utils.messages import all_strings, get_language
 
 
 def validate_subreddit(subreddit: str) -> Union[str, None]:
@@ -44,12 +45,16 @@ async def command_show(message: types.Message, state: FSMContext):
     args = message.get_args().split()
     if not args:
         await ChatStates.INP_SUBREDDIT.set()
-        await message.answer("Subreddit:",
+        await message.answer(all_strings.get(
+            get_language(
+                message.from_user.language_code)).get("input_inv_subreddit"),
                              reply_markup=await subreddit_kb(state),
                              disable_notification=True)
         return  # Start input session Sub -> Sortby -> Quantity
     if len(args) != 3:
-        await message.answer("Oopsie, wrong arguments here",
+        await message.answer(all_strings.get(
+            get_language(
+                message.from_user.language_code)).get("error_wrong_args"),
                              disable_notification=True)
         return
 
@@ -59,7 +64,9 @@ async def command_show(message: types.Message, state: FSMContext):
     quantity = validate_quantity(quantity)
 
     if not subreddit or not sort_by or not quantity:
-        await message.answer("Oopsie, wrong arguments here",
+        await message.answer(all_strings.get(
+            get_language(
+                message.from_user.language_code)).get("error_wrong_args"),
                              disable_notification=True)
         return
 
@@ -90,15 +97,17 @@ async def subreddit_input(message: types.Message, state: FSMContext):
     subreddit = validate_subreddit(message.text)
     # TODO: Check if sub exists
     if not subreddit:
-        await message.answer(
-            "What are u trying to tell me? I dont understand. You can try again or fuck yourself",
-            disable_notification=True)
+        await message.answer(all_strings.get(
+            get_language(
+                message.from_user.language_code)).get("error_wrong_input"),
+                             disable_notification=True)
         return
     await state.update_data(subreddit=subreddit)
     await _update_favorites(state, subreddit)
 
     await ChatStates.next()
-    await message.answer("Sort by:",
+    await message.answer(all_strings.get(
+        get_language(message.from_user.language_code)).get("input_inv_sortby"),
                          reply_markup=sortby_kb(),
                          disable_notification=True)
 
@@ -106,13 +115,16 @@ async def subreddit_input(message: types.Message, state: FSMContext):
 async def sortby_input(message: types.Message, state: FSMContext):
     sortby = validate_sortby(message.text)
     if not sortby:
-        await message.answer(
-            "What are u trying to tell me? I dont understand. You can try again or fuck yourself",
-            disable_notification=True)
+        await message.answer(all_strings.get(
+            get_language(
+                message.from_user.language_code)).get("error_wrong_input"),
+                             disable_notification=True)
         return
     await state.update_data(sortby=sortby)
     await ChatStates.next()
-    await message.answer("Quantity:",
+    await message.answer(all_strings.get(
+        get_language(
+            message.from_user.language_code)).get("input_inv_quantity"),
                          reply_markup=quantity_kb(),
                          disable_notification=True)
 
@@ -120,9 +132,10 @@ async def sortby_input(message: types.Message, state: FSMContext):
 async def quantity_input(message: types.Message, state: FSMContext):
     input_quantity = validate_quantity(message.text)
     if not input_quantity:
-        await message.answer(
-            "What are u trying to tell me? I dont understand. You can try again or fuck yourself",
-            disable_notification=True)
+        await message.answer(all_strings.get(
+            get_language(
+                message.from_user.language_code)).get("error_wrong_input"),
+                             disable_notification=True)
         return
 
     # Retrive data from state

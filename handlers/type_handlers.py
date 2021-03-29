@@ -2,7 +2,12 @@ from aiogram import types
 from aiogram.utils.exceptions import (MessageIsTooLong, WrongFileIdentifier,
                                       InvalidHTTPUrlContent)
 from utils.keyboards import post_url_kb
+<<<<<<< HEAD
 from typing import Generator, Tuple
+=======
+from utils.messages import get_language, all_strings
+from typing import Generator
+>>>>>>> 6636cff09ffcf701c63d311d1fd59de4c4bbb6a3
 from controllers.reddit import Post_Data, Post_Types, Reddit
 from math import ceil
 
@@ -63,13 +68,22 @@ async def video_post_handler(message: types.Message,
                                        post.post_link, show_more_btn=islast),
                                    disable_notification=True)
     except InvalidHTTPUrlContent:
+<<<<<<< HEAD
         await message.answer(
             "Thats not a video, you liar!.. At least I think so 😕 .\
             Here's your link anyways:",
             disable_notification=True)
         await link_post_handler(message, post, islast=islast)
+=======
+        await message.answer(all_strings.get(
+            get_language(message.from_user.language_code)).get("error_video"),
+                             disable_notification=True)
+        await link_post_handler(message, post)
+>>>>>>> 6636cff09ffcf701c63d311d1fd59de4c4bbb6a3
     except WrongFileIdentifier:
-        await message.answer("Step Dad, what are u doing!? Its too big!! 🤯 ",
+        await message.answer(all_strings.get(
+            get_language(
+                message.from_user.language_code)).get("error_file_2_big"),
                              disable_notification=True)
         await link_post_handler(message, post, islast=islast)
 
@@ -97,7 +111,13 @@ async def gif_post_handler(message: types.Message,
             reply_markup=post_url_kb(post.post_link, show_more_btn=islast),
             disable_notification=True)
     except WrongFileIdentifier:
+<<<<<<< HEAD
         await message.answer("Step Dad, what are u doing!? Its too big!! 🤯 ",
+=======
+        await message.answer(all_strings.get(
+            get_language(
+                message.from_user.language_code)).get("error_file_2_big"),
+>>>>>>> 6636cff09ffcf701c63d311d1fd59de4c4bbb6a3
                              disable_notification=True)
         await link_post_handler(message, post, islast=islast)
 
@@ -111,12 +131,19 @@ async def link_post_handler(message: types.Message,
                          disable_notification=True)
 
 
+<<<<<<< HEAD
 async def unknown_post_handler(message: types.Message,
                                post: Post_Data,
                                islast: bool = False):
     await message.answer("Hey, thats illegal! (post type) 👮 ",
                          reply_markup=post_url_kb(post.post_link,
                                                   show_more_btn=islast),
+=======
+async def unknown_post_handler(message: types.Message, post: Post_Data):
+    await message.answer(all_strings.get(
+        get_language(
+            message.from_user.language_code)).get("error_wrong_post_type"),
+>>>>>>> 6636cff09ffcf701c63d311d1fd59de4c4bbb6a3
                          disable_notification=True)
 
 
