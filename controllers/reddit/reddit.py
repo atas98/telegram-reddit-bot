@@ -1,6 +1,7 @@
 import logging
 import requests
 import typing
+import asyncstdlib
 
 from asyncpraw import Reddit as Redd
 from asyncpraw.models import Submission, Subreddit
@@ -124,8 +125,11 @@ class Reddit(object):
                          gallery_data=getattr(post, "gallery_data", None))
 
     async def get_posts_from_subreddit(
-            self, subreddit: Union[str, Subreddit], sort_by: Sort_Types,
-            quantity: int) -> Optional[Generator[Post_Data, None, None]]:
+            self,
+            subreddit: Union[str, Subreddit],
+            sort_by: Sort_Types,
+            quantity: int,
+            skip: int = 0) -> Optional[Generator[Post_Data, None, None]]:
         if isinstance(subreddit, str):
             try:
                 subreddit = await self.reddit.subreddit(subreddit)
@@ -136,19 +140,40 @@ class Reddit(object):
 
         try:
             if sort_by != Sort_Types.RANDOM:
-                async for post in getattr(subreddit, sort_by)(limit=quantity):
-                    yield Post_Data(
-                        id=post.id,
-                        title=post.title,
-                        text=post.selftext,
-                        url=post.url,
-                        post_link=self.get_post_link(post),
-                        type=self.get_post_type(post),
-                        score=post.score,
-                        nsfw=post.over_18,
-                        comments=post.num_comments,
-                        media_metadata=getattr(post, "media_metadata", None),
-                        gallery_data=getattr(post, "gallery_data", None))
+                if not skip:
+                    async for post in getattr(subreddit,
+                                              sort_by)(limit=quantity):
+                        yield Post_Data(
+                            id=post.id,
+                            title=post.title,
+                            text=post.selftext,
+                            url=post.url,
+                            post_link=self.get_post_link(post),
+                            type=self.get_post_type(post),
+                            score=post.score,
+                            nsfw=post.over_18,
+                            comments=post.num_comments,
+                            media_metadata=getattr(post, "media_metadata",
+                                                   None),
+                            gallery_data=getattr(post, "gallery_data", None))
+                elif skip > 0:
+                    async for i, post in asyncstdlib.enumerate(
+                            getattr(subreddit, sort_by)(limit=quantity)):
+                        if i < skip:
+                            continue
+                        yield Post_Data(
+                            id=post.id,
+                            title=post.title,
+                            text=post.selftext,
+                            url=post.url,
+                            post_link=self.get_post_link(post),
+                            type=self.get_post_type(post),
+                            score=post.score,
+                            nsfw=post.over_18,
+                            comments=post.num_comments,
+                            media_metadata=getattr(post, "media_metadata",
+                                                   None),
+                            gallery_data=getattr(post, "gallery_data", None))
             else:
                 for _ in range(quantity):
                     post = await subreddit.random()

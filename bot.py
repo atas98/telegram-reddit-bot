@@ -1,8 +1,6 @@
-import os
 import logging
 from pathlib import Path
 from utils import load_config
-from aiogram.utils.executor import start_polling
 
 if __name__ == '__main__':
     # Configure logging
@@ -16,7 +14,6 @@ if __name__ == '__main__':
 
     # Now load everything else
     from aiogram import executor
-    from utils.load_config import CONFIG
     from misc import dp
     from handlers import register_bot_commands
 

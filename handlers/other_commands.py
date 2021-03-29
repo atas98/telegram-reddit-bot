@@ -5,7 +5,6 @@ from utils import get_language, all_strings
 
 
 async def command_start(message: types.Message, state: FSMContext):
-    # TODO: if logged in show keyboard
     await state.finish()
     await message.answer(all_strings.get(
         get_language(message.from_user.language_code)).get("start"),
@@ -24,3 +23,4 @@ async def command_report(message: types.Message):
 
 async def command_cancel(message: types.Message, state: FSMContext):
     await state.reset_state(with_data=False)
+    await message.answer("❌ ")

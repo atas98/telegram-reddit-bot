@@ -1,5 +1,8 @@
+import asyncstdlib
 from aiogram import types
+from aiogram.dispatcher.storage import FSMContext
 from aiogram.types.message import ParseMode
+from .type_handlers import type_handlers
 from misc import reddit, bot
 
 
@@ -16,4 +19,29 @@ async def comments_bnt_callback(callback_query: types.CallbackQuery):
                                f'{comment.author.name}: {comment.body}',
                                parse_mode=ParseMode.MARKDOWN)
     await bot.answer_callback_query(callback_query.id)
+
+
+async def show_more_btn_callback(callback_query: types.CallbackQuery,
+                                 state: FSMContext):
+
+    # Retrive data from state
+    # Retrieve last index from cache
+    inputted_data = await state.get_data()
+    subreddit = inputted_data['subreddit']
+    sort_by = inputted_data['sortby']
+    quantity = inputted_data['quantity']
+    stoped_at = inputted_data['stoped_at']
+
+    # Cache viewed quantity for show_more_btn
+    await state.update_data(stoped_at=(stoped_at + quantity))
+
+    async for i, post in asyncstdlib.enumerate(
+            reddit.get_posts_from_subreddit(subreddit,
+                                            sort_by,
+                                            quantity,
+                                            skip=stoped_at)):
+        islast = (i + 1 == quantity)
+        await type_handlers[post.type](callback_query.message,
+                                       post,
+                                       islast=islast)
     await bot.answer_callback_query(callback_query.id)

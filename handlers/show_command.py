@@ -1,3 +1,4 @@
+import asyncstdlib
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 from controllers.reddit import Sort_Types
@@ -62,10 +63,13 @@ async def command_show(message: types.Message, state: FSMContext):
                              disable_notification=True)
         return
 
-    async for post in reddit.get_posts_from_subreddit(subreddit, sort_by,
-                                                      quantity):
-        await type_handlers[post.type](message, post)
-        # TODO: Append 'more' button to last post
+    # Cache viewed quantity for show_more_btn
+    await state.update_data(stoped_at=quantity)
+
+    async for i, post in asyncstdlib.enumerate(
+            reddit.get_posts_from_subreddit(subreddit, sort_by, quantity)):
+        islast = i + 1 == quantity
+        await type_handlers[post.type](message, post, islast=islast)
 
 
 async def _update_favorites(state: FSMContext, subreddit: str):
@@ -75,8 +79,9 @@ async def _update_favorites(state: FSMContext, subreddit: str):
         favorites = favorites['favorites']
     except KeyError:
         favorites = []
-    if len(favorites
-          ) < 6 and subreddit not in favorites and subreddit not in default:
+    if len(favorites) < 6\
+       and subreddit not in favorites\
+       and subreddit not in default:
         favorites.append(subreddit)
     await state.update_data(favorites=favorites)
 

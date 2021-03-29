@@ -5,6 +5,7 @@ from .other_commands import (command_start, command_help, command_report,
                              command_cancel)
 from .show_command import (command_show, subreddit_input, sortby_input,
                            quantity_input)
+from .inline_handlers import show_more_btn_callback
 from .raw_idle import raw_idle
 from .stickers import sticker_handler
 from utils.states import ChatStates
@@ -27,6 +28,10 @@ def initialize_handlers(dp: Dispatcher):
 
     dp.register_message_handler(sticker_handler,
                                 content_types=ContentTypes.STICKER)
+
+    dp.register_callback_query_handler(show_more_btn_callback,
+                                       lambda q: q == "show_more_callback",
+                                       state="*")
 
 
 async def register_bot_commands(dp: Dispatcher):
