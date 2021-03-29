@@ -22,5 +22,5 @@ async def command_report(message: types.Message):
 
 
 async def command_cancel(message: types.Message, state: FSMContext):
-    await state.reset_state(with_data=False)
     await message.answer("❌ ")
+    await state.reset_state(with_data=False)

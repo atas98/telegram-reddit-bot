@@ -1,10 +1,11 @@
 import logging
+import coloredlogs
 from pathlib import Path
 from utils import load_config
 
 if __name__ == '__main__':
     # Configure logging
-    logging.basicConfig(level=logging.INFO)
+    coloredlogs.install(level=logging.INFO)
 
     # Initialize and check config
     try:

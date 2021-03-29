@@ -30,7 +30,7 @@ def initialize_handlers(dp: Dispatcher):
                                 content_types=ContentTypes.STICKER)
 
     dp.register_callback_query_handler(show_more_btn_callback,
-                                       lambda q: q == "show_more_callback",
+                                       lambda q: q.data == "show_more_callback",
                                        state="*")
 
 

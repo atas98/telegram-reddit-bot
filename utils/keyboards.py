@@ -1,5 +1,6 @@
 from aiogram.types import (ReplyKeyboardMarkup, KeyboardButton,
-                           InlineKeyboardMarkup, InlineKeyboardButton)
+                           InlineKeyboardMarkup, InlineKeyboardButton,
+                           ReplyKeyboardRemove)
 from aiogram.dispatcher import FSMContext
 from typing import List
 import logging

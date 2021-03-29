@@ -70,8 +70,11 @@ async def command_show(message: types.Message, state: FSMContext):
                              disable_notification=True)
         return
 
-    # Cache viewed quantity for show_more_btn
-    await state.update_data(stoped_at=quantity)
+    # Cache inputed data for show_more_btn
+    await state.update_data(subreddit=subreddit,
+                            sortby=sort_by,
+                            quantity=quantity,
+                            stoped_at=quantity)
 
     async for i, post in asyncstdlib.enumerate(
             reddit.get_posts_from_subreddit(subreddit, sort_by, quantity)):
@@ -138,15 +141,19 @@ async def quantity_input(message: types.Message, state: FSMContext):
                              disable_notification=True)
         return
 
+    # Cache inputed data for show_more_btn
+    await state.update_data(quantity=input_quantity, stoped_at=input_quantity)
+
     # Retrive data from state
     input_data = await state.get_data()
     input_subreddit = input_data['subreddit']
     input_sortby = input_data['sortby']
 
     # Return posts
-    async for post in reddit.get_posts_from_subreddit(input_subreddit,
-                                                      input_sortby,
-                                                      input_quantity):
-        await type_handlers[post.type](message, post)
+    async for i, post in asyncstdlib.enumerate(
+        reddit.get_posts_from_subreddit(input_subreddit, input_sortby,
+                                        input_quantity)):
+        islast = i + 1 == input_quantity
+        await type_handlers[post.type](message, post, islast=islast)
 
     await state.reset_state(with_data=False)
