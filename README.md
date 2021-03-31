@@ -21,7 +21,7 @@ Telegram bot for retrieving reddit posts content. Telegram: [@RedditBot](https:/
   - [x] - Photo
   - [x] - Album
   - [x] - Gif
-  - [ ] - Reddit hosted video
+  - [x] - Reddit hosted video
   - [x] - Link
 - [x] - /show command
   - [x] - keyboard for subreddit (keep track of favorite subs)

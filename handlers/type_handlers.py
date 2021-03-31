@@ -1,3 +1,4 @@
+import logging
 from aiogram import types
 from aiogram.utils.exceptions import (MessageIsTooLong, WrongFileIdentifier,
                                       InvalidHTTPUrlContent)
@@ -44,26 +45,27 @@ async def text_post_handler(message: types.Message,
                                      disable_notification=True)
 
 
-# FIXME: https://www.reddit.com/r/spaceporn/comments/mfntg5/m13_the_great_globular_cluster_in_hercules/ causes exception=WrongFileIdentifier
 async def picture_post_handler(message: types.Message,
                                post: Post_Data,
                                state: FSMContext,
                                islast: bool = False):
-    # TODO: capture FileIsTooFBig exception
-    await message.answer_photo(post.url,
-                               caption=post.title,
-                               reply_markup=post_url_kb(post.post_link,
-                                                        show_more_btn=islast),
-                               disable_notification=True)
+    try:
+        await message.answer_photo(post.url,
+                                   caption=post.title,
+                                   reply_markup=post_url_kb(
+                                       post.post_link, show_more_btn=islast),
+                                   disable_notification=True)
+    except WrongFileIdentifier as err:
+        logging.error(err)
+        await link_post_handler(message, post, state, islast=islast)
 
 
 async def video_post_handler(message: types.Message,
                              post: Post_Data,
                              state: FSMContext,
                              islast: bool = False):
-    # TODO: parse post.media
     try:
-        await message.answer_video(post.url,
+        await message.answer_video(post.media['reddit_video']['fallback_url'],
                                    caption=post.title,
                                    reply_markup=post_url_kb(
                                        post.post_link, show_more_btn=islast),
@@ -72,7 +74,7 @@ async def video_post_handler(message: types.Message,
         await message.answer(all_strings.get(await get_language(
             message.from_user.language_code, state)).get("error_video"),
                              disable_notification=True)
-        await link_post_handler(message, post)
+        await link_post_handler(message, state, post, islast=islast)
     except WrongFileIdentifier:
         await message.answer(all_strings.get(await get_language(
             message.from_user.language_code, state)).get("error_file_2_big"),

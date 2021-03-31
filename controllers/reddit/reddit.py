@@ -9,7 +9,7 @@ from asyncpraw.exceptions import InvalidURL
 from asyncprawcore import NotFound
 from dataclasses import dataclass
 from enum import Enum, unique
-from typing import Any, Generator, Optional, Union
+from typing import Any, Generator, Optional, Union, Dict
 
 
 # TODO: Move all dataclasses/enums to separate file
@@ -51,8 +51,9 @@ class Post_Data:
     nsfw: bool
     score: int
     comments: int
+    media: Dict[str, Any]
     media_metadata: typing.List[Any]
-    gallery_data: typing.Dict[str, Any]
+    gallery_data: Dict[str, Any]
 
 
 class Reddit(object):
@@ -121,6 +122,7 @@ class Reddit(object):
                          comments=post.num_comments,
                          type=self.get_post_type(post),
                          nsfw=post.over_18,
+                         media=getattr(post, "media", None),
                          media_metadata=getattr(post, "media_metadata", None),
                          gallery_data=getattr(post, "gallery_data", None))
 
@@ -153,6 +155,7 @@ class Reddit(object):
                             score=post.score,
                             nsfw=post.over_18,
                             comments=post.num_comments,
+                            media=getattr(post, "media", None),
                             media_metadata=getattr(post, "media_metadata",
                                                    None),
                             gallery_data=getattr(post, "gallery_data", None))
@@ -171,6 +174,7 @@ class Reddit(object):
                             score=post.score,
                             nsfw=post.over_18,
                             comments=post.num_comments,
+                            media=getattr(post, "media", None),
                             media_metadata=getattr(post, "media_metadata",
                                                    None),
                             gallery_data=getattr(post, "gallery_data", None))
@@ -187,6 +191,7 @@ class Reddit(object):
                         nsfw=post.over_18,
                         score=post.score,
                         comments=post.num_comments,
+                        media=getattr(post, "media", None),
                         media_metadata=getattr(post, "media_metadata", None),
                         gallery_data=getattr(post, "gallery_data", None))
         except TypeError as err:
