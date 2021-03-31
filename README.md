@@ -27,7 +27,7 @@ Telegram bot for retrieving reddit posts content. Telegram: [@RedditBot](https:/
   - [x] - keyboard for subreddit (keep track of favorite subs)
   - [x] - keyboard for sort types
   - [x] - keyboard for quantity
-  - [ ] - **Show more** button
+  - [x] - **Show more** button
 - [ ] - /settings command
   - [ ] - manage lang
   - [ ] - manage favorite subreddits

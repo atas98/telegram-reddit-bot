@@ -34,6 +34,7 @@ class Settings:
     reddit: RedditCredits
     mongo: Mongo
     redis: Redis
+    langs: Tuple[str]
 
 
 def load_config(path: Path) -> Settings:
@@ -42,7 +43,8 @@ def load_config(path: Path) -> Settings:
     CONFIG = Settings(telegramToken=config["telegramToken"],
                       reddit=RedditCredits(**config["reddit"]),
                       mongo=Mongo(**config["mongo"]),
-                      redis=Redis(**config["redis"]))
+                      redis=Redis(**config["redis"]),
+                      langs=tuple(config["langs"]))
 
     # Retieve redist connection params for heroku's rediscloud
     url = os.environ.get('REDISCLOUD_URL')

@@ -1,6 +1,6 @@
-from .load_config import load_config
-from .messages import all_strings, get_language
-from .states import ChatStates
+from . import messages
 from . import keyboards
+from .load_config import load_config
+from .states import ChatStates
 
-__all__ = [load_config, all_strings, get_language, ChatStates, keyboards]
+__all__ = [load_config, messages, ChatStates, keyboards]

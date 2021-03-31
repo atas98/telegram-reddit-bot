@@ -3,6 +3,7 @@ from aiogram.utils.exceptions import (MessageIsTooLong, WrongFileIdentifier,
                                       InvalidHTTPUrlContent)
 from utils.keyboards import post_url_kb, ReplyKeyboardRemove
 from utils.messages import get_language, all_strings
+from aiogram.dispatcher import FSMContext
 from typing import Generator, Tuple
 from controllers.reddit import Post_Data, Post_Types, Reddit
 from math import ceil
@@ -20,6 +21,7 @@ def _text_chunks(text: str,
 
 async def text_post_handler(message: types.Message,
                             post: Post_Data,
+                            state: FSMContext,
                             islast: bool = False):
     try:
         await message.answer(f"<b>{post.title}</b>\n{post.text}",
@@ -45,6 +47,7 @@ async def text_post_handler(message: types.Message,
 # FIXME: https://www.reddit.com/r/spaceporn/comments/mfntg5/m13_the_great_globular_cluster_in_hercules/ causes exception=WrongFileIdentifier
 async def picture_post_handler(message: types.Message,
                                post: Post_Data,
+                               state: FSMContext,
                                islast: bool = False):
     # TODO: capture FileIsTooFBig exception
     await message.answer_photo(post.url,
@@ -56,6 +59,7 @@ async def picture_post_handler(message: types.Message,
 
 async def video_post_handler(message: types.Message,
                              post: Post_Data,
+                             state: FSMContext,
                              islast: bool = False):
     # TODO: parse post.media
     try:
@@ -65,20 +69,20 @@ async def video_post_handler(message: types.Message,
                                        post.post_link, show_more_btn=islast),
                                    disable_notification=True)
     except InvalidHTTPUrlContent:
-        await message.answer(all_strings.get(
-            get_language(message.from_user.language_code)).get("error_video"),
+        await message.answer(all_strings.get(await get_language(
+            message.from_user.language_code, state)).get("error_video"),
                              disable_notification=True)
         await link_post_handler(message, post)
     except WrongFileIdentifier:
-        await message.answer(all_strings.get(
-            get_language(
-                message.from_user.language_code)).get("error_file_2_big"),
+        await message.answer(all_strings.get(await get_language(
+            message.from_user.language_code, state)).get("error_file_2_big"),
                              disable_notification=True)
-        await link_post_handler(message, post, islast=islast)
+        await link_post_handler(message, post, state, islast=islast)
 
 
 async def album_post_handler(message: types.Message,
                              post: Post_Data,
+                             state: FSMContext,
                              islast: bool = False):
     album = []
     for url in Reddit.photos_from_album(post):
@@ -92,6 +96,7 @@ async def album_post_handler(message: types.Message,
 
 async def gif_post_handler(message: types.Message,
                            post: Post_Data,
+                           state: FSMContext,
                            islast: bool = False):
     try:
         await message.answer_animation(
@@ -100,15 +105,15 @@ async def gif_post_handler(message: types.Message,
             reply_markup=post_url_kb(post.post_link, show_more_btn=islast),
             disable_notification=True)
     except WrongFileIdentifier:
-        await message.answer(all_strings.get(
-            get_language(
-                message.from_user.language_code)).get("error_file_2_big"),
+        await message.answer(all_strings.get(await get_language(
+            message.from_user.language_code, state)).get("error_file_2_big"),
                              disable_notification=True)
-        await link_post_handler(message, post, islast=islast)
+        await link_post_handler(message, post, state, islast=islast)
 
 
 async def link_post_handler(message: types.Message,
                             post: Post_Data,
+                            state: FSMContext,
                             islast: bool = False):
     await message.answer(f"{post.title}\n{post.url}",
                          reply_markup=post_url_kb(post.post_link,
@@ -116,10 +121,12 @@ async def link_post_handler(message: types.Message,
                          disable_notification=True)
 
 
-async def unknown_post_handler(message: types.Message, post: Post_Data):
-    await message.answer(all_strings.get(
-        get_language(
-            message.from_user.language_code)).get("error_wrong_post_type"),
+async def unknown_post_handler(message: types.Message,
+                               state: FSMContext,
+                               post: Post_Data,
+                               islast=False):
+    await message.answer(all_strings.get(await get_language(
+        message.from_user.language_code, state)).get("error_wrong_post_type"),
                          disable_notification=True)
 
 

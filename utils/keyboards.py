@@ -43,20 +43,21 @@ def quantity_kb() -> ReplyKeyboardMarkup:
         .row(btn_5, btn_10)
 
 
-async def _get_favorites(state: FSMContext) -> List[str]:
+# TODO: move to utils and change code in delsub to this
+async def _get_favorites(state: FSMContext, fill=True) -> List[str]:
     default = ["memes", "games", "aww", "pics", "gifs",
                "worldnews"]  # TODO: move to config
+
+    favorites = await state.get_data()
+    favorites = favorites.get('favorites', [])
     try:
-        favorites = await state.get_data()
-        favorites = favorites['favorites']
-    except KeyError:
-        return default
-    else:
-        try:
+        if fill:
             return default[:len(default) - len(favorites)] + favorites
-        except Exception as err:
-            logging.error(err)
-            return default
+        else:
+            return favorites
+    except Exception as err:
+        logging.error(err)
+        return default
 
 
 async def subreddit_kb(state: FSMContext) -> ReplyKeyboardMarkup:
@@ -73,3 +74,28 @@ async def subreddit_kb(state: FSMContext) -> ReplyKeyboardMarkup:
         .row(btn_1, btn_2)\
         .row(btn_3, btn_4)\
         .row(btn_5, btn_6)
+
+
+def settings_kb() -> ReplyKeyboardMarkup:
+    btn_1 = KeyboardButton("Language")
+    btn_2 = KeyboardButton("Delete subreddit")
+    return ReplyKeyboardMarkup(resize_keyboard=True,
+                               one_time_keyboard=True)\
+        .add(btn_1).add(btn_2)
+
+
+def settings_lang_kb() -> ReplyKeyboardMarkup:
+    btn_1 = KeyboardButton('en')
+    btn_2 = KeyboardButton('ru')
+    return ReplyKeyboardMarkup(resize_keyboard=True,
+                               one_time_keyboard=True)\
+        .add(btn_1).add(btn_2)
+
+
+async def settings_del_sub_kb(state: FSMContext) -> ReplyKeyboardMarkup:
+    favorites = await _get_favorites(state, fill=False)
+    keyboard = ReplyKeyboardMarkup(resize_keyboard=True, one_time_keyboard=True)
+
+    for favorite in favorites:
+        keyboard.add(KeyboardButton(favorite))
+    return keyboard

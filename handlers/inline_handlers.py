@@ -46,5 +46,6 @@ async def show_more_btn_callback(callback_query: types.CallbackQuery,
         logging.warning(f"{i}:{stoped_at + quantity-2}")
         await type_handlers[post.type](callback_query.message,
                                        post,
+                                       state,
                                        islast=islast)
     await bot.answer_callback_query(callback_query.id)

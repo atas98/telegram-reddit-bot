@@ -1,9 +1,16 @@
-from collections import defaultdict
+from aiogram.dispatcher import FSMContext
 
 
-def get_language(lang_code: str) -> str:
-    langs = defaultdict(lambda: 'en', {'ru': 'ru'})
-    return langs[lang_code.split("-")[0]] if lang_code else 'en'
+async def get_language(lang_code: str, state: FSMContext) -> str:
+    from misc import CONFIG
+    state_lang_code = await state.get_data()
+    state_lang_code = state_lang_code.get('lang_code')\
+         or lang_code.split('-')[0] or 'en'
+
+    if state_lang_code in CONFIG.langs:
+        return state_lang_code
+    else:
+        return 'en'
 
 
 en_text_start = """Hey there, fellow redditor 👋!"""
@@ -15,9 +22,20 @@ en_text_help = """
 \tQuantity: [1, 3, 5] (max 10)
 \tE.g.: /show memes top 10
 /cancel - to reset your input
+/settings - manage bot settings
+\tDelete subreddit from favorites
+\tSet custom language
 \n..or just give me url (or urls) to reddit post so I can grab it for you"
 \n\tGitHub: https://github.com/atas98/telegram-reddit-bot
 """
+
+en_text_settings = """Settings:
+\t1. Choose your language
+\t2. Delete subreddit from favorites"""
+
+en_input_settings_lang = "Write language code (e.g.: en, ru)"
+
+en_input_settings_del_sub = "Write subreddit to delete"
 
 en_input_inv_subreddit = "Subreddit:"
 en_input_inv_sortby = "Sortby:"
@@ -38,9 +56,20 @@ ru_text_help = """Бот для взаимодействия с Реддитом
 \tКоличество: [1, 3, 5] (максимум 10)
 \tНапример: /show memes top 10
 /cancel - что бы сбросить введенные данные
+/settings - настройки бота
+\tУдалить сабреддит из избранного
+\tУстановить язык
 ..или просто поделись ссылкой (или ссылками) на пост"
 \n\tGitHub: https://github.com/atas98/telegram-reddit-bot
 """
+
+ru_text_settings = """Настройки:
+\t1. Выбрать язык
+\t2. Удалить сабреддит из истории"""
+
+ru_input_settings_lang = "Введи код страны (напр.: en, ru)"
+
+ru_input_settings_del_sub = "Введи название сабреддита из истории"
 
 ru_input_inv_subreddit = "Сабреддит:"
 ru_input_inv_sortby = "Сортировка:"
@@ -56,6 +85,9 @@ all_strings = {
     "en": {
         "start": en_text_start,
         "help": en_text_help,
+        "settings": en_text_settings,
+        "settings_lang": en_input_settings_lang,
+        "settings_del_sub": en_input_settings_del_sub,
         "input_inv_subreddit": en_input_inv_subreddit,
         "input_inv_sortby": en_input_inv_sortby,
         "input_inv_quantity": en_input_inv_quantity,
@@ -68,6 +100,9 @@ all_strings = {
     "ru": {
         "start": ru_text_start,
         "help": ru_text_help,
+        "settings": ru_text_settings,
+        "settings_lang": ru_input_settings_lang,
+        "settings_del_sub": ru_input_settings_del_sub,
         "input_inv_subreddit": ru_input_inv_subreddit,
         "input_inv_sortby": ru_input_inv_sortby,
         "input_inv_quantity": ru_input_inv_quantity,
