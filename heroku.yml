@@ -3,6 +3,6 @@ setup:
     - plan: rediscloud
 build:
   docker:
-    worker: ./Dockerfile
+    web: ./Dockerfile
 release:
-  image: worker
+  image: web

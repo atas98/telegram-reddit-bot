@@ -32,7 +32,7 @@ Telegram bot for retrieving reddit posts content. Telegram: [@RedditBot](https:/
   - [x] - manage lang
   - [x] - manage favorite subreddits
 - [ ] ~~- /subscribe~~
-- [ ] - Switch to webhooks
+- [x] - Switch to webhooks
 - [ ] ~~- Authorization for upvotes and comments~~
 - [ ] ~~- Connect MongoDB for subscriptions~~
 - [ ] ~~- Subscribe logic~~

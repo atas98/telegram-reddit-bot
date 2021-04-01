@@ -15,12 +15,6 @@ class RedditCredits:
 
 
 @dataclass
-class Mongo:
-    HOST: str
-    PORT: int
-
-
-@dataclass
 class Redis:
     HOST: str
     PORT: int
@@ -29,11 +23,24 @@ class Redis:
 
 
 @dataclass
+class Webhook:
+    HOST: str
+    PATH: str
+
+
+@dataclass
+class Webserver:
+    HOST: str
+    PORT: str
+
+
+@dataclass
 class Settings:
     telegramToken: str
     reddit: RedditCredits
-    mongo: Mongo
     redis: Redis
+    webhook: Webhook
+    webserver: Webserver
     langs: Tuple[str]
 
 
@@ -42,9 +49,12 @@ def load_config(path: Path) -> Settings:
     config = json.load(open(path, 'r'))
     CONFIG = Settings(telegramToken=config["telegramToken"],
                       reddit=RedditCredits(**config["reddit"]),
-                      mongo=Mongo(**config["mongo"]),
                       redis=Redis(**config["redis"]),
+                      webhook=Webhook(**config["webhook"]),
+                      webserver=Webserver(**config["webserver"]),
                       langs=tuple(config["langs"]))
+    # Retieve port for heroku
+    CONFIG.webserver.PORT = os.environ.get('PORT', CONFIG.webserver.PORT)
 
     # Retieve redist connection params for heroku's rediscloud
     url = os.environ.get('REDISCLOUD_URL')
