@@ -13,6 +13,8 @@ Telegram bot for retrieving reddit posts content. Telegram: [@RedditBot](https:/
 - **/settings** ->
   1. Manage favorite subreddits (for subreddit_kb)
   2. Manage language
+- **/report** -> report a bug
+- **/cancel** -> reset user state
 
 ## Roadmap
 

@@ -18,8 +18,8 @@ def sortby_kb() -> ReplyKeyboardMarkup:
         .row(btn_random)
 
 
-def post_url_kb(post_url: str,
-                show_more_btn: bool = False) -> InlineKeyboardMarkup:
+def post_inline_kb(post_url: str,
+                   show_more_btn: bool = False) -> InlineKeyboardMarkup:
     inline_btn_url = InlineKeyboardButton('Open on reddit', url=post_url)
     if not show_more_btn:
         return InlineKeyboardMarkup(row_width=1)\

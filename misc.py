@@ -1,7 +1,7 @@
 from aiogram import Bot, Dispatcher
 from aiogram.contrib.fsm_storage.redis import RedisStorage2
 from controllers.reddit import Reddit
-from utils.load_config import CONFIG
+from config.load_config import CONFIG
 
 # Initialize bot and dispatcher
 reddit = Reddit(CONFIG.reddit.client_id, CONFIG.reddit.client_secret,
@@ -16,6 +16,7 @@ dp = Dispatcher(bot,
 
 async def on_startup(dp):
     from handlers import register_bot_commands
+
     WEBHOOK_URL = f"{CONFIG.webhook.HOST}{CONFIG.webhook.PATH}"
     await bot.set_webhook(WEBHOOK_URL)
     await register_bot_commands(dp)

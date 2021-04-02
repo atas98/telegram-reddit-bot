@@ -1,22 +1,25 @@
+from typing import Union
+
 import asyncstdlib
 from aiogram import types
 from aiogram.dispatcher import FSMContext
-from controllers.reddit import Sort_Types
-from .type_handlers import type_handlers
+from keyboards import quantity_kb, sortby_kb, subreddit_kb
 from misc import reddit
-from typing import Union
-from utils import ChatStates
-from utils.keyboards import subreddit_kb, sortby_kb, quantity_kb
+from models.reddit import Sort_Types
+from utils import UserStates, get_favorites
 from utils.messages import all_strings, get_language
+from config.load_config import CONFIG
+
+from .type_handlers import type_handlers
 
 
 def validate_subreddit(subreddit: str) -> Union[str, None]:
     # Max subreddit name length is 21 char, and min is 2
-    MIN_LENGTH = 1
-    MAX_LENGTH = 21
     if subreddit[:2] == 'r/':
         subreddit = subreddit[2:]
-    if MIN_LENGTH > len(subreddit) > MAX_LENGTH:
+    if CONFIG.botconfig.subreddit_length.MIN > len(
+            subreddit) > CONFIG.botconfig.subreddit_length.MAX\
+                and reddit.sub_exists(subreddit):
         return None
     else:
         return subreddit
@@ -30,21 +33,20 @@ def validate_sortby(sortby: str) -> Union[Sort_Types, None]:
 
 
 def validate_quantity(quantity: str) -> Union[int, None]:
-    MIN_QUANTITY = 1  # TODO: Move to config
-    MAX_QUANTITY = 10
     if not quantity.isnumeric():
         return quantity
     quantity = int(quantity)
-    if MIN_QUANTITY > quantity > MAX_QUANTITY:
+    if CONFIG.botconfig.quantity.MIN > quantity > CONFIG.botconfig.quantity.MAX:
         return None
     else:
         return quantity
 
 
+# FIXME: subreddit vertification dosnt work
 async def command_show(message: types.Message, state: FSMContext):
     args = message.get_args().split()
     if not args:
-        await ChatStates.INP_SUBREDDIT.set()
+        await UserStates.INP_SUBREDDIT.set()
         await message.answer(all_strings.get(await get_language(
             message.from_user.language_code, state)).get("input_inv_subreddit"),
                              reply_markup=await subreddit_kb(state),
@@ -80,9 +82,9 @@ async def command_show(message: types.Message, state: FSMContext):
 
 
 async def _update_favorites(state: FSMContext, subreddit: str):
-    default = ["memes", "games", "aww", "pics", "gifs", "worldnews"]
-    favorites = await state.get_data()
-    favorites = favorites.get('favorites', [])
+    default = CONFIG.botconfig.default_favorites
+    favorites = await get_favorites(state, fill=False)
+
     if len(favorites) < 6\
        and subreddit not in favorites\
        and subreddit not in default:
@@ -101,7 +103,7 @@ async def subreddit_input(message: types.Message, state: FSMContext):
     await state.update_data(subreddit=subreddit)
     await _update_favorites(state, subreddit)
 
-    await ChatStates.next()
+    await UserStates.next()
     await message.answer(all_strings.get(await get_language(
         message.from_user.language_code, state)).get("input_inv_sortby"),
                          reply_markup=sortby_kb(),
@@ -116,7 +118,7 @@ async def sortby_input(message: types.Message, state: FSMContext):
                              disable_notification=True)
         return
     await state.update_data(sortby=sortby)
-    await ChatStates.next()
+    await UserStates.next()
     await message.answer(all_strings.get(await get_language(
         message.from_user.language_code, state)).get("input_inv_quantity"),
                          reply_markup=quantity_kb(),

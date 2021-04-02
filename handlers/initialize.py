@@ -10,7 +10,7 @@ from .settings_command import (command_settings, settings_choose,
 from .inline_handlers import show_more_btn_callback
 from .raw_idle import raw_idle
 from .stickers import sticker_handler
-from utils.states import ChatStates
+from models import UserStates
 
 
 def initialize_handlers(dp: Dispatcher):
@@ -21,15 +21,15 @@ def initialize_handlers(dp: Dispatcher):
     dp.register_message_handler(command_show, commands=["show"])
     dp.register_message_handler(command_settings, commands=["settings"])
 
-    dp.register_message_handler(settings_choose, state=ChatStates.INP_SETTINGS)
+    dp.register_message_handler(settings_choose, state=UserStates.INP_SETTINGS)
     dp.register_message_handler(settings_lang,
-                                state=ChatStates.INP_SETTINGS_LANG)
+                                state=UserStates.INP_SETTINGS_LANG)
     dp.register_message_handler(settings_del_sub,
-                                state=ChatStates.INP_SETTINGS_DELSUB)
+                                state=UserStates.INP_SETTINGS_DELSUB)
 
-    dp.register_message_handler(subreddit_input, state=ChatStates.INP_SUBREDDIT)
-    dp.register_message_handler(sortby_input, state=ChatStates.INP_SORTBY)
-    dp.register_message_handler(quantity_input, state=ChatStates.INP_QUANTITY)
+    dp.register_message_handler(subreddit_input, state=UserStates.INP_SUBREDDIT)
+    dp.register_message_handler(sortby_input, state=UserStates.INP_SORTBY)
+    dp.register_message_handler(quantity_input, state=UserStates.INP_QUANTITY)
 
     dp.register_message_handler(raw_idle,
                                 content_types=ContentTypes.TEXT,

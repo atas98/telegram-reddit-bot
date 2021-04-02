@@ -1,7 +1,7 @@
 import logging
 import coloredlogs
 from pathlib import Path
-from utils import load_config
+from config import load_config
 
 if __name__ == '__main__':
     # Configure logging
@@ -16,8 +16,7 @@ if __name__ == '__main__':
     # Now load everything else
     from aiogram import executor
     from misc import dp, on_startup, on_shutdown
-    from utils.load_config import CONFIG
-    # from handlers import register_bot_commands
+    from config.load_config import CONFIG
 
     executor.start_webhook(dispatcher=dp,
                            webhook_path=CONFIG.webhook.PATH,

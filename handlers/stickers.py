@@ -1,40 +1,19 @@
-from aiogram import types
+import json
 import random
+import logging
+from pathlib import Path
 
-# TODO: move to json
-_stickers = [
-    "CAACAgIAAxkBAAECD_lgT3PaUUsAATNrWYXIwiEplu2zqesAAlgAAzq-aRMGw_BbtjEb5h4E",
-    "CAACAgIAAxkBAAECEA1gT3PmlwJkTPaVYdtrWoJHJwG4NAACcwADOr5pE9HJzrGAAAGa5B4E",
-    "CAACAgIAAxkBAAECD-JgT3PLzt1DGwjsg3ceWMNJT_-eYAACSgADOr5pE0GrJTMzvAOyHgQ",
-    "CAACAgIAAxkBAAECD-NgT3PL_hbxNCXHSzAyn7vUK1iuvQACSwADOr5pE-bSWecx2R8vHgQ",
-    "CAACAgIAAxkBAAECD-RgT3PLmtidUwxcVOXvTv3lmfgOmgACTAADOr5pE-OZZ11g6lm9HgQ",
-    "CAACAgIAAxkBAAECD-VgT3PLQHqfdtDXRQmgBfbDupc7CgACTQADOr5pE8ncE1dgqqPqHgQ",
-    "CAACAgIAAxkBAAECD-ZgT3PMQ7wHA7gsTusl3wzW9-PAFwACTgADOr5pE8YKrUlIJVt4HgQ",
-    "CAACAgIAAxkBAAECD-dgT3PMKoYDrPN4QG1-YvW5uXVQmAACTwADOr5pE4t09whEa2GTHgQ",
-    "CAACAgIAAxkBAAECD-1gT3PUOcXiLMl-cLzxpfJiTmmEmAACUAADOr5pEwnjpflJ6UZNHgQ",
-    "CAACAgIAAxkBAAECD-9gT3PVvIwcZQNXQpSY0hBLUNJ0ywACUQADOr5pE4MSm7lxbT7tHgQ",
-    "CAACAgIAAxkBAAECD_BgT3PVpBlShzb1z70tKDhyX2OsagACUgADOr5pE8tFuUVd0OZ0HgQ",
-    "CAACAgIAAxkBAAECD_FgT3PWloyKfseLWepr1eerqOVaKwACUwADOr5pExuXhcveq1kMHgQ",
-    "CAACAgIAAxkBAAECD_JgT3PWdYKCBkIRYW0JYXB6J9atMgACVAADOr5pEwtAq-Pqrc4uHgQ",
-    "CAACAgIAAxkBAAECD_RgT3PX3vHiBz5cw002gZgxQxRn4AACVQADOr5pEyG0uCgw-9ZaHgQ",
-    "CAACAgIAAxkBAAECD_VgT3PXMHtVy0ZoeP3olp-GJmMyUgACVgADOr5pEyx9Xa2xe6ZWHgQ",
-    "CAACAgIAAxkBAAECD_hgT3Paw-YKmEzr6vb2eRpaniu4IwACVwADOr5pE15rjE_oRBQsHgQ",
-    "CAACAgIAAxkBAAECD_pgT3PbvM-sTjmckdX6v5ImLol85QACWQADOr5pEzmp0h8pXaVZHgQ",
-    "CAACAgIAAxkBAAECD_tgT3PbOX-f2rt6l8MiiKYhHdDqCQACWgADOr5pE0AIbAGLYpdjHgQ",
-    "CAACAgIAAxkBAAECD_1gT3Pc1XWKU1iFOpWTg6D5Y1yetQACWwADOr5pE-vzTiHlDolpHgQ",
-    "CAACAgIAAxkBAAECD_5gT3PccDRPXH-9_K63Clzc9LiNDgACXAADOr5pE7aHIyHdCGJwHgQ",
-    "CAACAgIAAxkBAAECD_9gT3PdGpX70d7B-geqqqkEiRCkVQACXQADOr5pE79wliJ9gjRXHgQ",
-    "CAACAgIAAxkBAAECEAFgT3PeDQ5A02Nd2j--ERFOxXPA-gACXgADOr5pE4RpjVNWHLdRHgQ",
-    "CAACAgIAAxkBAAECEAJgT3PefOk5TF1PQlcw5uRSvddEPgACXwADOr5pE6dIAfuZSJoHHgQ",
-    "CAACAgIAAxkBAAECEARgT3Pfwm1R3u89B-05VQJ62RAlfQACYAADOr5pE_-S1VHxvtfEHgQ",
-    "CAACAgIAAxkBAAECEAVgT3Pfdaw_Fe7SDcNv4e9gqO3oJwACYQADOr5pE1vlxmhDIqEGHgQ",
-    "CAACAgIAAxkBAAECEAZgT3PghBqJl_6hUQvcKtaiS2Du5wACYgADOr5pExyfCsGoldIBHgQ",
-    "CAACAgIAAxkBAAECEAdgT3PhohxQnwF3HDPpV92-aHSwSwACYwADOr5pExQhl98G6yWEHgQ",
-    "CAACAgIAAxkBAAECEApgT3Pj6nVye3guji0F02lSvXu0qwACZgADOr5pE-vqaXZbF0GVHgQ",
-    "CAACAgIAAxkBAAECEAxgT3PlEpBSqBOep0BthPtMCeu4bQACbwADOr5pEw93WO-JcFzaHgQ"
-]
+from aiogram import types
+
+_stickers = json.load(
+    open(Path.joinpath(Path(__file__).parent.parent, "config/stickers.json"),
+         'r'))['stickers']
 
 
 async def sticker_handler(message: types.Message):
+    logging.info([
+        len(_stickers),
+        Path.joinpath(Path(__file__).parent.parent, "config/stickers.json")
+    ])
     await message.answer_sticker(random.choice(_stickers),
                                  disable_notification=True)

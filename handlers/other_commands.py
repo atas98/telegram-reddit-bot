@@ -2,6 +2,7 @@ import logging
 from aiogram import types
 from aiogram.dispatcher import FSMContext
 from utils.messages import get_language, all_strings
+from keyboards import ReplyKeyboardRemove
 
 
 async def command_start(message: types.Message, state: FSMContext):
@@ -22,5 +23,5 @@ async def command_report(message: types.Message):
 
 
 async def command_cancel(message: types.Message, state: FSMContext):
-    await message.answer("❌ ", reply_markup=types.ReplyKeyboardRemove())
+    await message.answer("❌ ", reply_markup=ReplyKeyboardRemove())
     await state.reset_state(with_data=False)

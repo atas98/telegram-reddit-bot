@@ -1,20 +1,21 @@
 import logging
-from aiogram import types
-from aiogram.utils.exceptions import (MessageIsTooLong, WrongFileIdentifier,
-                                      InvalidHTTPUrlContent)
-from utils.keyboards import post_url_kb, ReplyKeyboardRemove
-from utils.messages import get_language, all_strings
-from aiogram.dispatcher import FSMContext
-from typing import Generator, Tuple
-from controllers.reddit import Post_Data, Post_Types, Reddit
 from math import ceil
+from typing import Generator, Tuple
+
+from aiogram import types
+from aiogram.dispatcher import FSMContext
+from aiogram.utils.exceptions import (InvalidHTTPUrlContent, MessageIsTooLong,
+                                      WrongFileIdentifier)
+from controllers.reddit import Reddit
+from keyboards import ReplyKeyboardRemove, post_inline_kb
+from models.reddit import Post_Data, Post_Types
+from utils.messages import all_strings, get_language
 
 MAX_TELEGRAM_MESSAGE_LENGTH = 4000
 
 
 def _text_chunks(text: str,
                  chunk_size: int) -> Generator[Tuple[str, bool], None, None]:
-    # TODO: create telegraph object
     chunks = ceil(len(text) / chunk_size)
     for i in range(0, len(text), chunk_size):
         yield (text[i:i + chunk_size], i + 1 == chunks)
@@ -27,8 +28,8 @@ async def text_post_handler(message: types.Message,
     try:
         await message.answer(f"<b>{post.title}</b>\n{post.text}",
                              parse_mode="html",
-                             reply_markup=post_url_kb(post.post_link,
-                                                      show_more_btn=islast),
+                             reply_markup=post_inline_kb(post.post_link,
+                                                         show_more_btn=islast),
                              disable_notification=True)
     except MessageIsTooLong:
         await message.answer(f"<b>{post.title}</b>",
@@ -40,7 +41,7 @@ async def text_post_handler(message: types.Message,
                 await message.answer(text_chunk, disable_notification=True)
             else:
                 await message.answer(text_chunk,
-                                     reply_markup=post_url_kb(
+                                     reply_markup=post_inline_kb(
                                          post.post_link, show_more_btn=islast),
                                      disable_notification=True)
 
@@ -52,7 +53,7 @@ async def picture_post_handler(message: types.Message,
     try:
         await message.answer_photo(post.url,
                                    caption=post.title,
-                                   reply_markup=post_url_kb(
+                                   reply_markup=post_inline_kb(
                                        post.post_link, show_more_btn=islast),
                                    disable_notification=True)
     except WrongFileIdentifier as err:
@@ -67,7 +68,7 @@ async def video_post_handler(message: types.Message,
     try:
         await message.answer_video(post.media['reddit_video']['fallback_url'],
                                    caption=post.title,
-                                   reply_markup=post_url_kb(
+                                   reply_markup=post_inline_kb(
                                        post.post_link, show_more_btn=islast),
                                    disable_notification=True)
     except InvalidHTTPUrlContent:
@@ -91,8 +92,8 @@ async def album_post_handler(message: types.Message,
         album.append(types.InputMediaPhoto(url))
     await message.answer_media_group(album, disable_notification=True)
     await message.answer(post.title,
-                         reply_markup=post_url_kb(post.post_link,
-                                                  show_more_btn=islast),
+                         reply_markup=post_inline_kb(post.post_link,
+                                                     show_more_btn=islast),
                          disable_notification=True)
 
 
@@ -104,7 +105,7 @@ async def gif_post_handler(message: types.Message,
         await message.answer_animation(
             post.url,
             caption=post.title,
-            reply_markup=post_url_kb(post.post_link, show_more_btn=islast),
+            reply_markup=post_inline_kb(post.post_link, show_more_btn=islast),
             disable_notification=True)
     except WrongFileIdentifier:
         await message.answer(all_strings.get(await get_language(
@@ -118,8 +119,8 @@ async def link_post_handler(message: types.Message,
                             state: FSMContext,
                             islast: bool = False):
     await message.answer(f"{post.title}\n{post.url}",
-                         reply_markup=post_url_kb(post.post_link,
-                                                  show_more_btn=islast),
+                         reply_markup=post_inline_kb(post.post_link,
+                                                     show_more_btn=islast),
                          disable_notification=True)
 
 

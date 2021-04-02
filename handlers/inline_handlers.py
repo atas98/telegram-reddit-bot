@@ -34,7 +34,7 @@ async def show_more_btn_callback(callback_query: types.CallbackQuery,
     quantity = inputted_data['quantity']
     stoped_at = inputted_data['stoped_at']
 
-    # # Cache viewed quantity for show_more_btn
+    # Cache viewed quantity for show_more_btn
     await state.update_data(stoped_at=(stoped_at + quantity))
 
     async for i, post in asyncstdlib.enumerate(

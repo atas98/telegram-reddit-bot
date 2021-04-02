@@ -7,7 +7,7 @@ async def get_language(lang_code: str, state: FSMContext) -> str:
     state_lang_code = state_lang_code.get('lang_code')\
          or lang_code.split('-')[0] or 'en'
 
-    if state_lang_code in CONFIG.langs:
+    if state_lang_code in CONFIG.botconfig.langs:
         return state_lang_code
     else:
         return 'en'
