@@ -19,7 +19,7 @@ def validate_subreddit(subreddit: str) -> Union[str, None]:
         subreddit = subreddit[2:]
     if CONFIG.botconfig.subreddit_length.MIN > len(
             subreddit) > CONFIG.botconfig.subreddit_length.MAX\
-                and reddit.sub_exists(subreddit):
+            and reddit.sub_exists(subreddit):
         return None
     else:
         return subreddit

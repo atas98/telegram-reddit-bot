@@ -7,7 +7,7 @@ from aiogram.dispatcher import FSMContext
 from aiogram.utils.exceptions import (InvalidHTTPUrlContent, MessageIsTooLong,
                                       WrongFileIdentifier)
 from controllers.reddit import Reddit
-from keyboards import ReplyKeyboardRemove, post_inline_kb
+from keyboards import post_inline_kb
 from models.reddit import Post_Data, Post_Types
 from utils.messages import all_strings, get_language
 
