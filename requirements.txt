@@ -3,5 +3,4 @@ asyncstdlib
 asyncpraw
 aiogram
 aioredis
-motor
 coloredlogs
