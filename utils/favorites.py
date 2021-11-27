@@ -18,7 +18,3 @@ async def get_favorites(state: FSMContext, fill=True) -> List[str]:
     except Exception as err:
         logging.error(err)
         return default
-        if fill:
-            return default
-        else:
-            return []

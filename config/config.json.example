@@ -1,0 +1,34 @@
+{
+    "telegramToken": "YourTelegramToken",
+    "reddit": {
+        "client_id": "YourRedditClientId",
+        "client_secret": "YourRedditClientSecret",
+        "user_agent": "YourRedditUserAgent"
+    },
+    "redis": {
+        "HOST": "YourRedisHost",
+        "PORT": 6379,
+        "DB": 0,
+        "PASSWORD": "YourRedisPassword"
+    },
+    "webhook": {
+        "HOST": "https://YourAppName.herokuapp.com",
+        "PATH": ""
+    },
+    "webserver": {
+        "HOST": "0.0.0.0",
+        "PORT": 3001
+    },
+    "botconfig": {
+        "langs": ["ru", "en"],
+        "default_favorites": ["memes", "games", "aww", "pics", "gifs", "worldnews"],
+        "subreddit_length": {
+            "MIN": 1,
+            "MAX": 21
+        },
+        "quantity" : {
+            "MIN": 1,
+            "MAX": 10
+        }
+    }
+}
