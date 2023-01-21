@@ -1,8 +1,0 @@
-setup:
-  addons:
-    - plan: rediscloud
-build:
-  docker:
-    web: ./Dockerfile
-release:
-  image: web
