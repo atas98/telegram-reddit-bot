@@ -24,8 +24,6 @@ async def comments_bnt_callback(callback_query: types.CallbackQuery):
 
 async def show_more_btn_callback(callback_query: types.CallbackQuery,
                                  state: FSMContext):
-    logging.debug("Inside!")
-
     # Retrive data from state
     # Retrieve last index from cache
     inputted_data = await state.get_data()
