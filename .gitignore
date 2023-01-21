@@ -3,3 +3,4 @@ __pycache__
 __old__
 *.log
 .vscode
+.env
