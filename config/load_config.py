@@ -1,10 +1,6 @@
 import json
 import os
-import re
-from dataclasses import dataclass
 from pathlib import Path
-from typing import Tuple
-from urllib.parse import urlparse
 
 from models.config import (RedditCredits, Redis, Settings, Webhook, Webserver,
                            BotConfig, DataBorders)
@@ -14,25 +10,33 @@ def load_config(path: Path) -> Settings:
     global CONFIG
     config = json.load(open(path, 'r'))
     CONFIG = Settings(
-        telegramToken=config["telegramToken"],
-        reddit=RedditCredits(**config["reddit"]),
-        redis=Redis(**config["redis"]),
-        webhook=Webhook(**config["webhook"]),
-        webserver=Webserver(**config["webserver"]),
+        use_webhook=config.get('use_webhook', True),
+        telegramToken=os.environ.get('TG_TOKEN') or config['telegramToken'],
+        reddit=RedditCredits(
+            client_id=os.environ.get('REDDIT_CLIENT_ID') or config['reddit'].get('client_id'),
+            client_secret=os.environ.get('REDDIT_CLIENT_SECRET')
+                or config['reddit'].get('client_secret'),
+            user_agent=config['reddit'].get('user_agent'),
+        ),
+        redis=Redis(
+            HOST=os.environ.get('REDIS_HOST') or config['redis'].get('HOST'),
+            PORT=os.environ.get('REDIS_PORT') or config['redis'].get('PORT'),
+            PASSWORD=os.environ.get('REDIS_PASSWORD') or config['redis'].get('PASSWORD'),
+            DB=os.environ.get('REDIS_DB') or config['redis'].get('DB'),
+        ),
+        webhook=Webhook(
+            HOST=os.environ.get('WEBHOOK_HOST') or config['webhook'].get('HOST'),
+            PATH=os.environ.get('WEBHOOK_PATH') or config['webhook'].get('PATH'),
+        ),
+        webserver=Webserver(
+            HOST=os.environ.get('WEBSERVER_HOST') or config['webserver'].get('HOST'),
+            PORT=os.environ.get('WEBSERVER_PORT') or config['webserver'].get('PORT'),
+        ),
         botconfig=BotConfig(
-            langs=tuple(config["botconfig"]["langs"]),
-            default_favorites=config["botconfig"]["default_favorites"],
+            langs=tuple(config['botconfig']['langs']),
+            default_favorites=config['botconfig']['default_favorites'],
             subreddit_length=DataBorders(
-                **config["botconfig"]["subreddit_length"]),
-            quantity=DataBorders(**config["botconfig"]["quantity"])))
+                **config['botconfig']['subreddit_length']),
+            quantity=DataBorders(**config['botconfig']['quantity'])))
 
-    # Retieve port for heroku
-    CONFIG.webserver.PORT = os.environ.get('PORT', CONFIG.webserver.PORT)
-
-    # Retieve redist connection params for heroku's rediscloud
-    url = os.environ.get('REDISCLOUD_URL')
-    if url:
-        url = urlparse(url)
-        (CONFIG.redis.HOST, CONFIG.redis.PORT,
-         CONFIG.redis.PASSWORD) = (url.hostname, url.port, url.password)
     return CONFIG

@@ -14,11 +14,13 @@ dp = Dispatcher(bot,
                                       password=CONFIG.redis.PASSWORD))
 
 
-async def on_startup(dp):
+async def on_startup(dp, use_webhook: bool = False):
     from handlers import register_bot_commands
 
-    WEBHOOK_URL = f"{CONFIG.webhook.HOST}{CONFIG.webhook.PATH}"
-    await bot.set_webhook(WEBHOOK_URL)
+    if CONFIG.use_webhook:
+        # Set webhook
+        WEBHOOK_URL = f"{CONFIG.webhook.HOST}{CONFIG.webhook.PATH}"
+        await bot.set_webhook(WEBHOOK_URL)
     await register_bot_commands(dp)
 
 
@@ -27,7 +29,8 @@ async def on_shutdown(dp):
     Graceful shutdown. This method is recommended by aiohttp docs.
     """
     # Remove webhook.
-    await bot.delete_webhook()
+    if CONFIG.use_webhook:
+        await bot.delete_webhook()
 
     # Close Redis connection.
     await dp.storage.close()

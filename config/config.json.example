@@ -1,4 +1,5 @@
 {
+    "use_webhook": true,
     "telegramToken": "YourTelegramToken",
     "reddit": {
         "client_id": "YourRedditClientId",

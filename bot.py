@@ -18,10 +18,16 @@ if __name__ == '__main__':
     from misc import dp, on_startup, on_shutdown
     from config.load_config import CONFIG
 
-    executor.start_webhook(dispatcher=dp,
-                           webhook_path=CONFIG.webhook.PATH,
-                           on_startup=on_startup,
-                           on_shutdown=on_shutdown,
-                           skip_updates=True,
-                           host=CONFIG.webserver.HOST,
-                           port=CONFIG.webserver.PORT)
+    if CONFIG.use_webhook:
+        executor.start_webhook(dispatcher=dp,
+                            webhook_path=CONFIG.webhook.PATH,
+                            on_startup=on_startup,
+                            on_shutdown=on_shutdown,
+                            skip_updates=True,
+                            host=CONFIG.webserver.HOST,
+                            port=CONFIG.webserver.PORT)
+    else:
+        executor.start_polling(dispatcher=dp,
+                            on_startup=on_startup,
+                            on_shutdown=on_shutdown,
+                            skip_updates=True)

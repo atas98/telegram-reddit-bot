@@ -45,6 +45,7 @@ class BotConfig:
 
 @dataclass
 class Settings:
+    use_webhook: bool
     telegramToken: str
     reddit: RedditCredits
     redis: Redis
