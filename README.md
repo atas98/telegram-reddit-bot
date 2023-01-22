@@ -1,3 +1,5 @@
+![fly.io](https://github.com/atas98/telegram-reddit-bot/.github/workflows/fly.yml/badge.svg)
+
 # telegram-reddit-bot
 
 Telegram bot for retrieving reddit posts content. Telegram: [@RedditBot](https://t.me/atasrdtpeeperbot)
