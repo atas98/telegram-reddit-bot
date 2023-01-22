@@ -21,7 +21,8 @@ def load_config(path: Path) -> Settings:
         redis=Redis(
             HOST=os.environ.get('REDIS_HOST') or config['redis'].get('HOST'),
             PORT=os.environ.get('REDIS_PORT') or config['redis'].get('PORT'),
-            PASSWORD=os.environ.get('REDIS_PASSWORD') or config['redis'].get('PASSWORD'),
+            PASSWORD=(os.environ.get('REDIS_PASSWORD') or config['redis'].get('PASSWORD'))
+                     if not os.environ.get('REDIS_WO_PASSWORD') else None,
             DB=os.environ.get('REDIS_DB') or config['redis'].get('DB'),
         ),
         webhook=Webhook(
