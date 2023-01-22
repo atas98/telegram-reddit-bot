@@ -1,4 +1,4 @@
-![fly.io](https://github.com/atas98/telegram-reddit-bot/.github/workflows/fly.yml/badge.svg)
+![fly.io](https://github.com/atas98/telegram-reddit-bot/actions/workflows/fly.yaml/badge.svg)
 
 # telegram-reddit-bot
 
