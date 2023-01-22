@@ -19,7 +19,7 @@ async def command_help(message: types.Message, state: FSMContext):
 
 
 async def command_report(message: types.Message):
-    logging.info(f"Report:{message.from_user.username}:{message.get_args()}")
+    logging.error(f"Report:{message.from_user.username}:{message.get_args()}")
 
 
 async def command_cancel(message: types.Message, state: FSMContext):

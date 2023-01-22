@@ -10,6 +10,8 @@ if __name__ == '__main__':
     # Initialize and check config
     try:
         load_config(Path.joinpath(Path(__file__).parent, "config/config.json"))
+    except FileNotFoundError:
+        load_config(Path.joinpath(Path(__file__).parent, "config/config.json.example"))
     except ValueError as ex:
         exit(f"Error: {ex}")
 
