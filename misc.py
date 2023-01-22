@@ -2,6 +2,7 @@ import redis
 
 from aiogram import Bot, Dispatcher
 from aiogram.contrib.fsm_storage.redis import RedisStorage2
+from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from controllers.reddit import Reddit
 from config.load_config import CONFIG
 
@@ -9,12 +10,13 @@ from config.load_config import CONFIG
 reddit = Reddit(CONFIG.reddit.client_id, CONFIG.reddit.client_secret,
                 CONFIG.reddit.user_agent)
 bot = Bot(token=CONFIG.telegramToken, parse_mode="HTML", validate_token=True)
-if CONFIG.redis.URL:
-    storage = RedisStorage2()
-    storage._redis = redis.from_url(CONFIG.redis.URL)
-else:
-    storage = RedisStorage2(host=CONFIG.redis.HOST, port=CONFIG.redis.PORT,
-                            db=CONFIG.redis.DB, password=CONFIG.redis.PASSWORD)
+storage = MemoryStorage()
+# if CONFIG.redis.URL:
+#     storage = RedisStorage2()
+#     storage._redis = redis.from_url(CONFIG.redis.URL)
+# else:
+#     storage = RedisStorage2(host=CONFIG.redis.HOST, port=CONFIG.redis.PORT,
+#                             db=CONFIG.redis.DB, password=CONFIG.redis.PASSWORD)
 dp = Dispatcher(bot,
                 storage=storage)
 
