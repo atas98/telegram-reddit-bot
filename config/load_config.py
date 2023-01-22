@@ -28,6 +28,7 @@ def load_config(path: Path) -> Settings:
         ),
         webhook=Webhook(
             HOST=os.environ.get('WEBHOOK_HOST') or config['webhook'].get('HOST'),
+            PORT=os.environ.get('WEBHOOK_PORT') or config['webhook'].get('PORT'),
             PATH=os.environ.get('WEBHOOK_PATH') or config['webhook'].get('PATH'),
         ),
         webserver=Webserver(

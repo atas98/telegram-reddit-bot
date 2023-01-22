@@ -24,8 +24,9 @@ async def on_startup(dp, use_webhook: bool = False):
 
     if CONFIG.use_webhook:
         # Set webhook
-        WEBHOOK_URL = f"{CONFIG.webhook.HOST}{CONFIG.webhook.PATH}"
-        await bot.set_webhook(WEBHOOK_URL)
+        WEBHOOK_URL = f"{CONFIG.webhook.HOST}:{CONFIG.webhook.PORT}{CONFIG.webhook.PATH}"
+        if not await bot.set_webhook(WEBHOOK_URL):
+            exit("Failed to set webhook")
     await register_bot_commands(dp)
 
 

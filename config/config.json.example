@@ -15,6 +15,7 @@
     },
     "webhook": {
         "HOST": "https://YourAppName.herokuapp.com",
+        "PORT": 443,
         "PATH": ""
     },
     "webserver": {

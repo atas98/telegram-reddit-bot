@@ -21,6 +21,7 @@ class Redis:
 @dataclass
 class Webhook:
     HOST: str
+    PORT: int
     PATH: str
 
 
