@@ -11,6 +11,7 @@ class RedditCredits:
 
 @dataclass
 class Redis:
+    URL: str
     HOST: str
     PORT: int
     DB: int

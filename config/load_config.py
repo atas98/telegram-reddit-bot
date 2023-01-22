@@ -19,6 +19,7 @@ def load_config(path: Path) -> Settings:
             user_agent=config['reddit'].get('user_agent'),
         ),
         redis=Redis(
+            URL=os.environ.get('REDIS_URL') or config['redis'].get('URL'),
             HOST=os.environ.get('REDIS_HOST') or config['redis'].get('HOST'),
             PORT=os.environ.get('REDIS_PORT') or config['redis'].get('PORT'),
             PASSWORD=(os.environ.get('REDIS_PASSWORD') or config['redis'].get('PASSWORD'))
